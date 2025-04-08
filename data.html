@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manajemen Data</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .card { @apply bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 space-y-4; }
+  </style>
+  <script>
+    const hour = new Date().getHours();
+    if (hour >= 18 || hour < 6) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 min-h-screen p-6 text-gray-800 dark:text-white">
+  <div class="max-w-4xl mx-auto">
+    <div class="card">
+      <h1 class="text-3xl font-bold text-center text-blue-700 dark:text-blue-300">Manajemen Data</h1>
+
+      <div id="alert-container"></div>
+
+      <div class="flex justify-between items-center mt-4">
+        <div class="flex gap-2 items-center w-full">
+          <input type="text" id="search" placeholder="Cari Nama atau Kode" class="flex-1 rounded-md border border-blue-300 dark:border-gray-600 p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white" />
+          <button id="cari" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">Cari</button>
+        </div>
+        <button id="lihat-arsip" class="ml-4 bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition">Lihat Arsip</button>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mt-4">
+        <h2 class="text-lg font-semibold mb-3">Tambah / Edit Data</h2>
+        <div class="grid md:grid-cols-4 gap-4">
+          <input type="text" id="nama" placeholder="Nama" class="border p-2 rounded-md dark:bg-gray-800 dark:text-white" />
+          <input type="text" id="judul" placeholder="Judul" class="border p-2 rounded-md dark:bg-gray-800 dark:text-white" />
+          <input type="text" id="kode" placeholder="Kode" class="border p-2 rounded-md dark:bg-gray-800 dark:text-white" />
+          <input type="text" id="link" placeholder="Link (Opsional)" class="border p-2 rounded-md dark:bg-gray-800 dark:text-white" />
+        </div>
+        <button id="tambah" class="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition">Tambah</button>
+      </div>
+
+      <div class="mt-6">
+        <h2 class="text-lg font-semibold mb-3" id="judul-daftar">Daftar Data</h2>
+        <ul id="daftar" class="space-y-3"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const supabaseUrl = 'https://qzdvdfebkzlwkhvxwsju.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6ZHZkZmVia3psd2todnh3c2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcyMTA4OTksImV4cCI6MjA1Mjc4Njg5OX0.Z9XKmX49vu0kZwn6YMom8QeLNNdKQMXCIkxcIoHKQFs';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    const namaInput = document.getElementById('nama');
+    const judulInput = document.getElementById('judul');
+    const kodeInput = document.getElementById('kode');
+    const linkInput = document.getElementById('link');
+    const tambahButton = document.getElementById('tambah');
+    const daftarList = document.getElementById('daftar');
+    const alertContainer = document.getElementById('alert-container');
+    const searchInput = document.getElementById('search');
+    const cariButton = document.getElementById('cari');
+    const arsipButton = document.getElementById('lihat-arsip');
+    const judulDaftar = document.getElementById('judul-daftar');
+
+    let showingArchive = false;
+
+    function showAlert(message, type = 'success') {
+      alertContainer.innerHTML = `<div class="bg-${type === 'success' ? 'green' : 'red'}-100 border border-${type === 'success' ? 'green' : 'red'}-400 text-${type === 'success' ? 'green' : 'red'}-700 px-4 py-2 rounded-md mb-4 dark:bg-opacity-10">
+        <strong>${type === 'success' ? 'Berhasil!' : 'Gagal!'}</strong> ${message}
+      </div>`;
+      setTimeout(() => alertContainer.innerHTML = '', 4000);
+    }
+
+    async function fetchData(searchTerm = '') {
+      const table = showingArchive ? 'arsip' : 'nama_kode';
+      let query = supabase.from(table).select('*').order('id', { ascending: true });
+      if (searchTerm) query = query.or(`nama.ilike.%${searchTerm}%,kode.ilike.%${searchTerm}%`);
+      const { data, error } = await query;
+      if (error) return showAlert(error.message, 'error');
+      renderList(data, showingArchive);
+    }
+
+    function renderList(data, isArchive = false) {
+      daftarList.innerHTML = '';
+      data.forEach(item => {
+        const el = document.createElement('li');
+        el.className = 'bg-white dark:bg-gray-700 border dark:border-gray-600 p-4 rounded-md flex justify-between items-center';
+        el.innerHTML = `
+          <div>
+            <p class="font-bold text-lg">${item.nama}</p>
+            <p class="text-sm text-gray-700 dark:text-gray-300">${item.judul || '(Tanpa Judul)'}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Kode: ${item.kode}</p>
+          </div>
+          <div class="flex gap-3 text-sm">
+            ${item.link ? `<a href="${item.link}" target="_blank" class="text-blue-600 hover:underline dark:text-blue-400">Lihat</a>` : ''}
+            ${isArchive
+              ? `
+                <button class="text-green-600 hover:underline restore-btn" data-id="${item.id}">Kembalikan</button>
+                <button class="text-red-600 hover:underline delete-arsip-btn" data-id="${item.id}">Hapus</button>
+              `
+              : `
+                <button class="text-yellow-600 hover:underline edit-btn" data-id="${item.id}">Edit</button>
+                <button class="text-red-600 hover:underline delete-btn" data-id="${item.id}">Hapus</button>
+                <button class="text-gray-600 hover:underline archive-btn" data-id="${item.id}">Arsip</button>
+              `}
+          </div>
+        `;
+        daftarList.appendChild(el);
+      });
+
+      if (!isArchive) {
+        addEventListenersToButtons();
+      } else {
+        document.querySelectorAll('.restore-btn').forEach(btn => {
+          btn.addEventListener('click', () => restoreArchiveData(btn.dataset.id));
+        });
+        document.querySelectorAll('.delete-arsip-btn').forEach(btn => {
+          btn.addEventListener('click', () => deleteArchiveData(btn.dataset.id));
+        });
+      }
+    }
+
+    function addEventListenersToButtons() {
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => editData(btn.dataset.id));
+      });
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => deleteData(btn.dataset.id));
+      });
+      document.querySelectorAll('.archive-btn').forEach(btn => {
+        btn.addEventListener('click', () => archiveData(btn.dataset.id));
+      });
+    }
+
+    async function addData() {
+      const nama = namaInput.value.trim();
+      const judul = judulInput.value.trim();
+      const kode = kodeInput.value.trim();
+      const link = linkInput.value.trim();
+      if (!nama || !kode) return showAlert('Nama dan Kode wajib diisi!', 'error');
+
+      const { error } = await supabase.from('nama_kode').insert([{ nama, judul, kode, link }]);
+      if (error) return showAlert(error.message, 'error');
+      showAlert('Data berhasil ditambahkan!');
+      namaInput.value = judulInput.value = kodeInput.value = linkInput.value = '';
+      fetchData();
+    }
+
+    async function editData(id) {
+      const listItem = document.querySelector(`[data-id="${id}"]`).closest('li');
+      const nama = listItem.querySelector('p.font-bold').textContent;
+      const judul = listItem.querySelectorAll('p')[1].textContent;
+      const kode = listItem.querySelectorAll('p')[2].textContent.replace('Kode: ', '');
+      const link = listItem.querySelector('a')?.href || '';
+
+      namaInput.value = nama;
+      judulInput.value = judul;
+      kodeInput.value = kode;
+      linkInput.value = link;
+      tambahButton.textContent = 'Simpan';
+
+      tambahButton.onclick = async () => {
+        const newNama = namaInput.value.trim();
+        const newJudul = judulInput.value.trim();
+        const newKode = kodeInput.value.trim();
+        const newLink = linkInput.value.trim();
+        if (!newNama || !newKode) return showAlert('Nama dan Kode wajib diisi!', 'error');
+
+        const { error } = await supabase.from('nama_kode').update({ nama: newNama, judul: newJudul, kode: newKode, link: newLink }).eq('id', id);
+        if (error) return showAlert(error.message, 'error');
+
+        showAlert('Data berhasil diperbarui!');
+        tambahButton.textContent = 'Tambah';
+        tambahButton.onclick = addData;
+        namaInput.value = judulInput.value = kodeInput.value = linkInput.value = '';
+        fetchData();
+      };
+    }
+
+    async function deleteData(id) {
+      if (!confirm('Yakin ingin menghapus data ini?')) return;
+      const { error } = await supabase.from('nama_kode').delete().eq('id', id);
+      if (error) return showAlert(error.message, 'error');
+      showAlert('Data berhasil dihapus!');
+      fetchData();
+    }
+
+    async function archiveData(id) {
+      const listItem = document.querySelector(`[data-id="${id}"]`).closest('li');
+      const nama = listItem.querySelector('p.font-bold').textContent;
+      const judul = listItem.querySelectorAll('p')[1].textContent;
+      const kode = listItem.querySelectorAll('p')[2].textContent.replace('Kode: ', '');
+      const link = listItem.querySelector('a')?.href || '';
+
+      if (!confirm('Pindahkan data ini ke arsip?')) return;
+
+      const { error: insertError } = await supabase.from('arsip').insert([{ nama, judul, kode, link }]);
+      if (insertError) return showAlert('Gagal mengarsipkan: ' + insertError.message, 'error');
+
+      const { error: deleteError } = await supabase.from('nama_kode').delete().eq('id', id);
+      if (deleteError) return showAlert('Gagal menghapus setelah arsip: ' + deleteError.message, 'error');
+
+      showAlert('Data berhasil dipindahkan ke arsip!');
+      fetchData();
+    }
+
+    async function deleteArchiveData(id) {
+      if (!confirm('Hapus permanen dari arsip?')) return;
+      const { error } = await supabase.from('arsip').delete().eq('id', id);
+      if (error) return showAlert(error.message, 'error');
+      showAlert('Data berhasil dihapus dari arsip!');
+      fetchData();
+    }
+
+    async function restoreArchiveData(id) {
+      const listItem = document.querySelector(`[data-id="${id}"]`).closest('li');
+      const nama = listItem.querySelector('p.font-bold').textContent;
+      const judul = listItem.querySelectorAll('p')[1].textContent;
+      const kode = listItem.querySelectorAll('p')[2].textContent.replace('Kode: ', '');
+      const link = listItem.querySelector('a')?.href || '';
+
+      if (!confirm('Kembalikan data ini ke daftar utama?')) return;
+
+      const { error: insertError } = await supabase.from('nama_kode').insert([{ nama, judul, kode, link }]);
+      if (insertError) return showAlert('Gagal mengembalikan: ' + insertError.message, 'error');
+
+      const { error: deleteError } = await supabase.from('arsip').delete().eq('id', id);
+      if (deleteError) return showAlert('Gagal menghapus dari arsip: ' + deleteError.message, 'error');
+
+      showAlert('Data berhasil dikembalikan!');
+      fetchData();
+    }
+
+    tambahButton.addEventListener('click', addData);
+    cariButton.addEventListener('click', () => fetchData(searchInput.value.trim()));
+    arsipButton.addEventListener('click', () => {
+      showingArchive = !showingArchive;
+      arsipButton.textContent = showingArchive ? 'Lihat Data Aktif' : 'Lihat Arsip';
+      judulDaftar.textContent = showingArchive ? 'Daftar Arsip' : 'Daftar Data';
+      fetchData();
+    });
+
+    fetchData();
+  </script>
+</body>
+</html>
