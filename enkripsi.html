@@ -5,228 +5,220 @@
     <title>Enkripsi & Dekripsi File Aman</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg-color: #f3f4f6;
-            --text-color: #1f2937;
-            --primary-color: #6366f1;
-            --primary-hover: #7e57c2;
-            --secondary-color: #e5e7eb;
-            --secondary-hover: #d1d5db;
-            --success-color: #10b981;
-            --success-hover: #059669;
-            --border-color: #d1d5db;
-            --input-bg: #fff;
-            --input-border: #e0e6ed;
-            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --border-radius: 0.5rem;
-            --transition-duration: 0.2s;
-        }
+      .dark-mode {
+        --bg-color: #111827;
+        --text-color: #f9fafb;
+        --primary-color: #8b5cf6;
+        --primary-hover: #a855f7;
+        --secondary-color: #1f2937;
+        --secondary-hover: #374151;
+        --success-color: #14e5b0;
+        --success-hover: #06d6a0;
+        --border-color: #4b5563;
+        --input-bg: #374151;
+        --input-border: #6b7280;
+        --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+      }
 
-        .dark-mode {
-            --bg-color: #111827;
-            --text-color: #f9fafb;
-            --primary-color: #8b5cf6;
-            --primary-hover: #a855f7;
-            --secondary-color: #1f2937;
-            --secondary-hover: #374151;
-            --success-color: #14e5b0;
-            --success-hover: #06d6a0;
-            --border-color: #4b5563;
-            --input-bg: #374151;
-            --input-border: #6b7280;
-            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-        }
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        transition: background-color 0.2s, color 0.2s;
+      }
 
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            transition: background-color var(--transition-duration), color var(--transition-duration);
-        }
+      .tabs {
+        display: flex;
+        justify-content: center;
+        padding: 0.75rem 0;
+        background-color: transparent;
+      }
 
-        .tabs {
-            display: flex;
-            justify-content: center;
-            padding: 1rem 0;
-            background-color: transparent;
-        }
+      .tab-button {
+        flex: 1;
+        padding: 1rem;
+        text-align: center;
+        color: var(--text-color);
+        cursor: pointer;
+        font-weight: 500;
+        border-bottom: 2px solid transparent;
+        transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+        border-radius: 0.375rem 0.375rem 0 0;
+        background-color: var(--secondary-color);
+      }
 
-        .tab-button {
-            flex: 1;
-            padding: 1rem;
-            text-align: center;
-            color: var(--text-color);
-            cursor: pointer;
-            font-weight: 500;
-            border-bottom: 2px solid transparent;
-            transition: color var(--transition-duration), border-color var(--transition-duration), background-color var(--transition-duration);
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
-            background-color: var(--secondary-color);
-        }
+      .tab-button:hover {
+        color: var(--primary-color);
+        border-bottom-color: var(--primary-color);
+        background-color: var(--secondary-hover);
+      }
 
-        .tab-button:hover {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
-            background-color: var(--secondary-hover);
-        }
+      .tab-button.active {
+        color: #fff;
+        border-bottom-color: var(--success-color);
+        background-color: var(--success-color);
+        font-weight: 700;
+      }
 
-        .tab-button.active {
-            color: #fff;
-            border-bottom-color: var(--success-color);
-            background-color: var(--success-color);
-            font-weight: 700;
-        }
+      .tab-content {
+        display: none;
+        padding: 1.25rem;
+      }
 
-        .tab-content {
-            display: none;
-            padding: 2rem;
-        }
+      .tab-content.active {
+        display: block;
+      }
 
-        .tab-content.active {
-            display: block;
-        }
+      .container {
+        max-width: 800px;
+        margin: auto;
+        background-color: var(--bg-color);
+        padding: 2rem;
+        border-radius: 0.5rem;
+        margin-top: 1.5rem;
+        box-shadow: var(--box-shadow);
+        border: 1px solid var(--border-color);
+      }
 
+      h2 {
+        margin-bottom: 1rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        text-align: center;
+      }
+
+      label {
+        display: block;
+        margin-top: 0.75rem;
+        margin-bottom: 0.375rem;
+        font-weight: 500;
+        color: var(--text-color);
+      }
+
+      input, select {
+        padding: 0.75rem;
+        width: calc(100% - 2rem);
+        border-radius: 0.375rem;
+        border: 2px solid var(--input-border);
+        background-color: var(--input-bg);
+        color: var(--text-color);
+        margin-bottom: 1rem;
+        transition: border-color 0.2s, background-color 0.2s;
+        box-sizing: border-box;
+      }
+
+      input:focus, select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      }
+
+      button {
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.375rem;
+        border: none;
+        background-color: var(--primary-color);
+        color: white;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        width: 100%;
+        display: block;
+        margin: 1rem auto;
+        text-align: center;
+      }
+
+      button:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      button:active {
+        transform: translateY(0);
+        box-shadow: none;
+      }
+
+      .status {
+        margin-top: 1.5rem;
+        font-size: 0.875rem;
+        color: var(--text-color);
+        text-align: center;
+        padding: 0.75rem;
+        background-color: var(--secondary-color);
+        border-radius: 0.375rem;
+        border: 1px solid var(--border-color);
+        word-wrap: break-word;
+        overflow-x: auto;
+        max-width: 100%;
+      }
+
+      a.download-link {
+        display: inline-block;
+        margin-top: 1rem;
+        background-color: var(--success-color);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.375rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.2s, transform 0.2s;
+        text-align: center;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      a.download-link:hover {
+        background-color: var(--success-hover);
+        transform: translateY(-2px);
+      }
+
+      #previewContainer {
+        margin-top: 1.5rem;
+        text-align: center;
+        border: 2px dashed var(--border-color);
+        padding: 1rem;
+        border-radius: 0.375rem;
+        background-color: var(--secondary-color);
+        overflow-x: auto;
+        max-width: 100%;
+      }
+
+      #previewContainer img, #previewContainer video {
+        max-width: 100%;
+        margin-top: 0.75rem;
+        border-radius: 0.375rem;
+        box-shadow: var(--box-shadow);
+      }
+
+      @media (max-width: 640px) {
         .container {
-            max-width: 800px;
-            margin: auto;
-            background-color: var(--bg-color);
-            padding: 2rem;
-            border-radius: var(--border-radius);
-            margin-top: 2rem;
-            box-shadow: var(--box-shadow);
-            border: 1px solid var(--border-color);
+          padding: 1rem;
+          margin-top: 1rem;
         }
-
-        h2 {
-            margin-bottom: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            text-align: center;
+        .tabs {
+          flex-direction: column;
         }
-
-        label {
-            display: block;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--text-color);
+        .tab-button {
+          width: 100%;
+          border-bottom: 2px solid transparent;
+          border-radius: 0;
         }
-
+        .tab-button:not(.active) {
+          background-color: var(--secondary-hover);
+        }
         input, select {
-            padding: 0.75rem;
-            width: 100%;
-            border-radius: var(--border-radius);
-            border: 2px solid var(--input-border);
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            margin-bottom: 1rem;
-            transition: border-color var(--transition-duration), background-color var(--transition-duration);
-            box-sizing: border-box;
+            width: calc(100% - 1.5rem);
         }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-        }
-
-        button {
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius);
-            border: none;
-            background-color: var(--primary-color);
-            color: white;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color var(--transition-duration), transform var(--transition-duration), box-shadow var(--transition-duration);
-            width: 100%;
-            display: block;
-            margin: 1rem auto;
-            text-align: center;
-        }
-
-        button:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        button:active {
-            transform: translateY(0);
-            box-shadow: none;
-        }
-
-        .status {
-            margin-top: 1.5rem;
-            font-size: 0.875rem;
-            color: var(--text-color);
-            text-align: center;
-            padding: 0.75rem;
-            background-color: var(--secondary-color);
-            border-radius: var(--border-radius);
-            border: 1px solid var(--border-color);
-        }
-
-        a.download-link {
-            display: inline-block;
-            margin-top: 1rem;
-            background-color: var(--success-color);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius);
-            text-decoration: none;
-            font-weight: 600;
-            transition: background-color var(--transition-duration), transform var(--transition-duration);
-            text-align: center;
-            width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        a.download-link:hover {
-            background-color: var(--success-hover);
-            transform: translateY(-2px);
-        }
-
-        #previewContainer {
-            margin-top: 1.5rem;
-            text-align: center;
-            border: 2px dashed var(--border-color);
-            padding: 1rem;
-            border-radius: var(--border-radius);
-            background-color: var(--secondary-color);
-        }
-
-        #previewContainer img, #previewContainer video {
-            max-width: 100%;
-            margin-top: 0.75rem;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-        }
-
-        @media (max-width: 640px) {
-            .container {
-                padding: 1.5rem;
-                margin-top: 1rem;
-            }
-            .tabs {
-                flex-direction: column;
-            }
-            .tab-button {
-                width: 100%;
-                border-bottom: 2px solid transparent;
-                border-radius: 0;
-            }
-            .tab-button:not(.active) {
-                background-color: var(--secondary-hover);
-            }
-        }
+      }
     </style>
 </head>
-<body>
+<body class="bg-gray-100 dark:bg-gray-900">
 
 <div class="tabs">
     <div class="tab-button active" data-tab="encryptTab">Enkripsi</div>
@@ -236,21 +228,21 @@
 <div class="container">
     <div id="encryptTab" class="tab-content active">
         <h2>Enkripsi File</h2>
-        <label for="fileInputEnc">Pilih file:</label>
-        <input type="file" id="fileInputEnc" />
-        <button id="encryptBtn">Enkripsi</button>
-        <p class="status" id="statusEnc"></p>
-        <a id="downloadLink" class="download-link" style="display:none;">Download Enkripsi</a>
+        <label for="fileInputEnc" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Pilih file:</label>
+        <input type="file" id="fileInputEnc" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 leading-tight focus:outline-none focus:shadow-outline mb-4">
+        <button id="encryptBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Enkripsi</button>
+        <p class="status text-gray-700 dark:text-gray-300 mt-6 py-3 px-4 bg-gray-200 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-700" id="statusEnc"></p>
+        <a id="downloadLink" class="download-link bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4 inline-block" style="display:none;">Download Enkripsi</a>
     </div>
 
     <div id="decryptTab" class="tab-content">
         <h2>Dekripsi File</h2>
-        <label for="fileInputDec">Pilih file terenkripsi:</label>
-        <input type="file" id="fileInputDec" />
-        <label for="keyInput">Kunci HEX:</label>
-        <input type="text" id="keyInput" placeholder="Masukkan kunci HEX" />
-        <label for="fileTypeSelect">Pilih ekstensi hasil dekripsi:</label>
-        <select id="fileTypeSelect">
+        <label for="fileInputDec" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Pilih file terenkripsi:</label>
+        <input type="file" id="fileInputDec" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 leading-tight focus:outline-none focus:shadow-outline mb-4">
+        <label for="keyInput" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Kunci HEX:</label>
+        <input type="text" id="keyInput" placeholder="Masukkan kunci HEX" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 leading-tight focus:outline-none focus:shadow-outline mb-4">
+        <label for="fileTypeSelect" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Pilih ekstensi hasil dekripsi:</label>
+        <select id="fileTypeSelect" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 leading-tight focus:outline-none focus:shadow-outline mb-4">
             <option value="txt">.txt</option>
             <option value="png">.png</option>
             <option value="jpg">.jpg</option>
@@ -258,10 +250,10 @@
             <option value="zip">.zip</option>
             <option value="rar">.rar</option>
         </select>
-        <button id="decryptBtn">Dekripsi</button>
-        <p class="status" id="statusDec"></p>
-        <a id="downloadLinkDec" class="download-link" style="display:none;">Download Dekripsi</a>
-        <div id="previewContainer"></div>
+        <button id="decryptBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Dekripsi</button>
+        <p class="status text-gray-700 dark:text-gray-300 mt-6 py-3 px-4 bg-gray-200 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-700" id="statusDec"></p>
+        <a id="downloadLinkDec" class="download-link bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4 inline-block" style="display:none;">Download Dekripsi</a>
+        <div id="previewContainer" class="mt-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded p-4 bg-gray-100 dark:bg-gray-800 overflow-x-auto"></div>
     </div>
 </div>
 
@@ -361,7 +353,7 @@
 
         const rawKey = await crypto.subtle.exportKey("raw", key);
         const keyHex = bufferToHex(rawKey);
-        status.innerHTML = `Enkripsi selesai.<br><strong>Kunci HEX:</strong> ${keyHex}`;
+        status.innerHTML = `Enkripsi selesai.<br><strong class="font-semibold">Kunci HEX:</strong> <span class="font-mono text-sm">${keyHex}</span>`;
     });
 
     document.getElementById('decryptBtn').addEventListener('click', async () => {
@@ -393,12 +385,14 @@
             if (["jpg", "jpeg", "png"].includes(ext)) {
                 const img = document.createElement("img");
                 img.src = url;
+                img.classList.add("mt-3", "rounded-md", "shadow-md");
                 preview.appendChild(img);
             } else if (ext === "mp4") {
                 const video = document.createElement("video");
                 video.src = url;
                 video.controls = true;
                 video.style.maxWidth = "100%";
+                video.classList.add("mt-3", "rounded-md", "shadow-md");
                 preview.appendChild(video);
             }
 
