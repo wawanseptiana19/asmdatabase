@@ -67,6 +67,138 @@
     .error-message {
       @apply text-red-500 text-sm mt-1;
     }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: #2d3748; /* Dark background */
+      color: #f7fafc; /* Light text */
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #4a5568; /* Darker border */
+      width: 90%;
+      max-width: 500px;
+      border-radius: 8px;
+      position: relative;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Slightly darker shadow */
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #4a5568; /* Darker border */
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #f56565; /* Red color for heading in dark theme*/
+    }
+
+    .close-button {
+      color: #cbd5e0; /* Light color for close button */
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      cursor: pointer;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .modal-body {
+      margin-bottom: 20px;
+    }
+
+    .modal-body label {
+      display: block;
+      margin-bottom: 5px;
+      color: #cbd5e0; /* Light color for labels */
+      font-weight: 600;
+    }
+
+    .modal-body input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #4a5568; /* Darker border for inputs */
+      border-radius: 5px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+      background-color: #2d3748; /* Dark background for inputs */
+      color: #f7fafc; /* Light text color for inputs */
+    }
+
+    .modal-body input:focus {
+      outline: none;
+      border-color: #f56565; /* Red color for focus in dark theme */
+      box-shadow: 0 0 5px rgba(244, 114, 182, 0.3);
+    }
+
+    .modal-footer {
+      text-align: right;
+    }
+
+    .modal-footer button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .modal-footer button:hover {
+      background-color: #c53030;
+    }
+
+    .modal-footer button.cancel {
+      background-color: #f56565;
+      color: white;
+      margin-right: 10px;
+    }
+
+    .modal-footer button.cancel:hover {
+      background-color: #c53030;
+      color: white;
+    }
+
+    .modal-footer button.submit {
+      background-color: #48bb78;
+      color: white;
+    }
+
+    .modal-footer button.submit:hover {
+      background-color: #38a169;
+      color: white;
+    }
   </style>
   <script>
     const hour = new Date().getHours();
@@ -80,30 +212,15 @@
     <h1 class="text-3xl font-bold text-center text-blue-700 dark:text-blue-300 mb-6">Manajemen Data</h1>
     <div id="alert-container"></div>
     
-    <!-- Container untuk tampilan horizontal -->
     <div class="flex flex-col lg:flex-row gap-6">
-      <!-- Kolom kiri: Form tambah/edit data -->
       <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 lg:w-1/3">
-        <h2 class="text-lg font-semibold mb-3">Tambah / Edit Data</h2>
-        <div class="space-y-4">
-          <input type="text" id="nama" placeholder="Nama" class="border p-2 rounded-md dark:bg-gray-800 dark:text-white w-full" />
-          <input type="text" id="judul" placeholder="Judul" class="border p-2 rounded-md dark:bg-gray-800 dark:text-white w-full" />
-          <input type="text" id="kode" placeholder="Kode" class="border p-2 rounded-md dark:bg-gray-800 dark:text-white w-full" />
-          <input type="text" id="link" placeholder="Link (Opsional)" class="border p-2 rounded-md dark:bg-gray-800 dark:text-white w-full" />
-        </div>
-        <div id="error-message-container" class="hidden mt-2">
-          <p id="error-message" class="error-message"></p>
-        </div>
-        <button id="tambah" class="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition">Tambah</button>
+        <button id="tambah-data" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition">Tambah / Edit Data</button>
       </div>
 
-      <!-- Kolom kanan: Pencarian dan daftar data -->
       <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 lg:w-2/3 flex flex-col">
-        <!-- Pencarian dan tombol arsip -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
           <div class="flex gap-2 items-center w-full sm:w-auto">
             <input type="text" id="search" placeholder="Cari Nama atau Kode" class="rounded-md border border-blue-300 dark:border-gray-600 p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white" />
-            <button id="cari" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition whitespace-nowrap">Cari</button>
           </div>
           <button id="lihat-arsip" class="bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-800 transition whitespace-nowrap">Lihat Arsip</button>
         </div>
@@ -114,25 +231,54 @@
     </div>
   </div>
 
+  <div id="dataModal" class="modal">
+    <div class="modal-content">
+      <span class="close-button">&times;</span>
+      <h2>Tambah / Edit Data</h2>
+      <div class="modal-body">
+        <label for="nama">Nama:</label>
+        <input type="text" id="nama-modal" placeholder="Nama" />
+        <label for="judul">Judul:</label>
+        <input type="text" id="judul-modal" placeholder="Judul" />
+        <label for="kode">Kode:</label>
+        <input type="text" id="kode-modal" placeholder="Kode" />
+        <label for="link">Link (Opsional):</label>
+        <input type="text" id="link-modal" placeholder="Link (Opsional)" />
+        <div id="error-message-container-modal" class="hidden mt-2">
+          <p id="error-message-modal" class="error-message"></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="cancel">Batal</button>
+        <button type="button" class="submit">Simpan</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const supabaseUrl = 'https://qzdvdfebkzlwkhvxwsju.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6ZHZkZmVia3psd2todnh3c2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcyMTA4OTksImV4cCI6MjA1Mjc4Njg5OX0.Z9XKmX49vu0kZwn6YMom8QeLNNdKQMXCIkxcIoHKQFs';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    const namaInput = document.getElementById('nama');
-    const judulInput = document.getElementById('judul');
-    const kodeInput = document.getElementById('kode');
-    const linkInput = document.getElementById('link');
-    const tambahButton = document.getElementById('tambah');
-    const daftarList = document.getElementById('daftar');
+    const tambahDataButton = document.getElementById('tambah-data');
+    const dataModal = document.getElementById('dataModal');
+    const closeButton = document.querySelector('.close-button');
+    const cancelButton = document.querySelector('.cancel');
+    const submitButton = document.querySelector('.submit');
+
+    const namaInputModal = document.getElementById('nama-modal');
+    const judulInputModal = document.getElementById('judul-modal');
+    const kodeInputModal = document.getElementById('kode-modal');
+    const linkInputModal = document.getElementById('link-modal');
     const alertContainer = document.getElementById('alert-container');
     const searchInput = document.getElementById('search');
-    const cariButton = document.getElementById('cari');
     const arsipButton = document.getElementById('lihat-arsip');
     const judulDaftar = document.getElementById('judul-daftar');
-    const errorMessageContainer = document.getElementById('error-message-container');
-    const errorMessage = document.getElementById('error-message');
+    const daftarList = document.getElementById('daftar');
+    const errorMessageContainerModal = document.getElementById('error-message-container-modal');
+    const errorMessageModal = document.getElementById('error-message-modal');
 
+    let editingId = null;
     let showingArchive = false;
     let timeoutId;
 
@@ -194,7 +340,10 @@
 
     function addEventListenersToButtons() {
       document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', () => editData(btn.dataset.id));
+        btn.addEventListener('click', () => {
+          editingId = btn.dataset.id;
+          openModal(btn.dataset.id);
+        });
       });
       document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', () => deleteData(btn.dataset.id));
@@ -205,39 +354,40 @@
     }
 
     async function addData() {
-      const nama = namaInput.value.trim();
-      const judul = judulInput.value.trim();
-      const kode = kodeInput.value.trim();
-      const link = linkInput.value.trim();
+      const nama = namaInputModal.value.trim();
+      const judul = judulInputModal.value.trim();
+      const kode = kodeInputModal.value.trim();
+      const link = linkInputModal.value.trim();
 
       let hasErrors = false;
 
       if (!nama) {
-        namaInput.classList.add('input-error');
+        namaInputModal.classList.add('input-error');
         hasErrors = true;
       } else {
-        namaInput.classList.remove('input-error');
+        namaInputModal.classList.remove('input-error');
       }
       if (!kode) {
-        kodeInput.classList.add('input-error');
+        kodeInputModal.classList.add('input-error');
         hasErrors = true;
       } else {
-        kodeInput.classList.remove('input-error');
+        kodeInputModal.classList.remove('input-error');
       }
 
       if (hasErrors) {
-        errorMessage.textContent = 'Nama dan Kode wajib diisi.';
-        errorMessageContainer.classList.remove('hidden');
+        errorMessageModal.textContent = 'Nama dan Kode wajib diisi.';
+        errorMessageContainerModal.classList.remove('hidden');
         return;
       } else {
-        errorMessageContainer.classList.add('hidden');
+        errorMessageContainerModal.classList.add('hidden');
       }
 
       const { error } = await supabase.from('nama_kode').insert([{ nama, judul, kode, link }]);
       if (error) return showAlert(error.message, 'error');
       showAlert('Data berhasil ditambahkan!');
-      namaInput.value = judulInput.value = kodeInput.value = linkInput.value = '';
+      namaInputModal.value = judulInputModal.value = kodeInputModal.value = linkInputModal.value = '';
       fetchData();
+      closeModal();
     }
 
     async function editData(id) {
@@ -247,50 +397,58 @@
       const kode = listItem.querySelectorAll('p')[2].textContent.replace('Kode: ', '');
       const link = listItem.querySelector('a')?.href || '';
 
-      namaInput.value = nama;
-      judulInput.value = judul;
-      kodeInput.value = kode;
-      linkInput.value = link;
-      tambahButton.textContent = 'Simpan';
+      namaInputModal.value = nama;
+      judulInputModal.value = judul;
+      kodeInputModal.value = kode;
+      linkInputModal.value = link;
+      editingId = id;
+      openModal(id);
+    }
 
-      tambahButton.onclick = async () => {
-        const newNama = namaInput.value.trim();
-        const newJudul = judulInput.value.trim();
-        const newKode = kodeInput.value.trim();
-        const newLink = linkInput.value.trim();
+    async function saveData() {
+      const nama = namaInputModal.value.trim();
+      const judul = judulInputModal.value.trim();
+      const kode = kodeInputModal.value.trim();
+      const link = linkInputModal.value.trim();
 
-        let hasErrors = false;
+      let hasErrors = false;
 
-        if (!newNama) {
-          namaInput.classList.add('input-error');
-          hasErrors = true;
-        } else {
-          namaInput.classList.remove('input-error');
-        }
-        if (!newKode) {
-          kodeInput.classList.add('input-error');
-          hasErrors = true;
-        } else {
-          kodeInput.classList.remove('input-error');
-        }
+      if (!nama) {
+        namaInputModal.classList.add('input-error');
+        hasErrors = true;
+      } else {
+        namaInputModal.classList.remove('input-error');
+      }
+      if (!kode) {
+        kodeInputModal.classList.add('input-error');
+        hasErrors = true;
+      } else {
+        kodeInputModal.classList.remove('input-error');
+      }
 
-        if (hasErrors) {
-          errorMessage.textContent = 'Nama dan Kode wajib diisi.';
-          errorMessageContainer.classList.remove('hidden');
-          return;
-        } else {
-          errorMessageContainer.classList.add('hidden');
-        }
+      if (hasErrors) {
+        errorMessageModal.textContent = 'Nama dan Kode wajib diisi.';
+        errorMessageContainerModal.classList.remove('hidden');
+        return;
+      } else {
+        errorMessageContainerModal.classList.add('hidden');
+      }
 
-        const { error } = await supabase.from('nama_kode').update({ nama: newNama, judul: newJudul, kode: newKode, link: newLink }).eq('id', id);
+      if (editingId) {
+        // Update data yang ada
+        const { error } = await supabase.from('nama_kode').update({ nama, judul, kode, link }).eq('id', editingId);
         if (error) return showAlert(error.message, 'error');
-
         showAlert('Data berhasil diperbarui!');
-        tambahButton.textContent = 'Tambah';
-        tambahButton.onclick = addData;
-        namaInput.value = judulInput.value = kodeInput.value = linkInput.value = '';
-        fetchData();
-      };
+      } else {
+        // Tambah data baru
+        const { error } = await supabase.from('nama_kode').insert([{ nama, judul, kode, link }]);
+        if (error) return showAlert(error.message, 'error');
+        showAlert('Data berhasil ditambahkan!');
+      }
+
+      fetchData();
+      closeModal();
+      resetModalForm();
     }
 
     async function deleteData(id) {
@@ -347,12 +505,60 @@
       fetchData();
     }
 
-    tambahButton.addEventListener('click', addData);
-    cariButton.addEventListener('click', () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        fetchData(searchInput.value.trim());
-      }, 300);
+    // Modal Functions
+    function openModal(id = null) {
+      dataModal.style.display = 'block';
+      if (id) {
+        const listItem = document.querySelector(`[data-id="${id}"]`).closest('li');
+        const nama = listItem.querySelector('p.font-bold').textContent;
+        const judul = listItem.querySelectorAll('p')[1].textContent;
+        const kode = listItem.querySelectorAll('p')[2].textContent.replace('Kode: ', '');
+        const link = listItem.querySelector('a')?.href || '';
+
+        namaInputModal.value = nama;
+        judulInputModal.value = judul;
+        kodeInputModal.value = kode;
+        linkInputModal.value = link;
+        editingId = id;
+        submitButton.textContent = 'Simpan';
+      } else {
+        submitButton.textContent = 'Tambah';
+        resetModalForm();
+        editingId = null;
+      }
+    }
+
+    function closeModal() {
+      dataModal.style.display = 'none';
+      resetModalForm();
+      editingId = null;
+    }
+
+    function resetModalForm() {
+      namaInputModal.value = '';
+      judulInputModal.value = '';
+      kodeInputModal.value = '';
+      linkInputModal.value = '';
+      errorMessageModal.textContent = '';
+      errorMessageContainerModal.classList.add('hidden');
+      namaInputModal.classList.remove('input-error');
+      kodeInputModal.classList.remove('input-error');
+    }
+
+    tambahDataButton.addEventListener('click', openModal);
+    closeButton.addEventListener('click', closeModal);
+    cancelButton.addEventListener('click', closeModal);
+    submitButton.addEventListener('click', () => {if (editingId) {
+        saveData(editingId);
+      } else {
+        saveData();
+      }
+    });
+
+    window.addEventListener('click', (event) => {
+      if (event.target === dataModal) {
+        closeModal();
+      }
     });
 
     searchInput.addEventListener('input', () => {
@@ -373,3 +579,4 @@
   </script>
 </body>
 </html>
+
