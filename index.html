@@ -1,595 +1,106 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Menu Navigasi</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Metro UI Tiles</title>
   <style>
+    /* Variabel warna tema Metro */
+    :root {
+      --tile-bg-1: #00aba9;
+      --tile-bg-2: #2b5797;
+      --tile-bg-3: #da532c;
+      --tile-bg-4: #ffc40d;
+      --tile-hover-opacity: 0.8;
+      --text-color: #fff;
+      --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Reset dasar */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
     body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(to right, #e0eafc, #cfdef3);
+      font-family: var(--font-family);
+      background: #1b1b1b;
+      color: var(--text-color);
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      overflow: auto;
     }
-    .container {
-      background-color: #ffffff;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      padding: 40px;
-      text-align: center;
-      width: 90%;
-      max-width: 350px;
-      transition: transform 0.3s ease;
-      margin: 20px auto;
+
+    /* Container grid 2x2 */
+    .metro-container {
+      display: grid;
+      grid-template-columns: repeat(2, 150px);
+      grid-template-rows: repeat(2, 150px);
+      gap: 16px;
     }
-    .container:hover {
-      transform: scale(1.02);
-    }
-    h1 {
-      margin-bottom: 20px;
-      color: #333;
-      font-weight: 600;
-    }
-    /* Bagian input QR tidak ditampilkan */
-    #qr-input-container {
-      display: none;
-    }
-    #qr-video {
-      width: 100%;
-      max-height: 300px;
-      margin-bottom: 20px;
-      border-radius: 12px;
-      border: 1px solid #ddd;
-      background-color: #000;
-    }
-    #scanned-snapshot {
-      width: 100%;
-      max-height: 300px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      display: none;
-      border: 1px solid #ddd;
-    }
-    #scan-message {
-      margin-bottom: 20px;
-      font-size: 16px;
-      color: #28a745;
-      font-weight: bold;
-    }
-    #error-message {
-      color: red;
-      margin-bottom: 20px;
-      font-size: 16px;
-      display: none;
-    }
-    #password-prompt {
-      display: none;
-      flex-direction: column;
-      align-items: stretch;
-      margin-bottom: 20px;
-    }
-    #password-prompt label {
-      margin-bottom: 8px;
-      text-align: left;
-      font-weight: bold;
-      color: #555;
-    }
-    #password-input {
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      font-size: 16px;
-      transition: border-color 0.3s ease;
-    }
-    #password-input:focus {
-      outline: none;
-      border-color: #007BFF;
-      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-    }
-    #password-submit {
-      padding: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #fff;
-      background-color: #007BFF;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      margin-top: 10px;
-    }
-    #password-submit:hover {
-      background-color: #0056b3;
-    }
-    .button-group {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      margin-bottom: 20px;
-    }
-    .btn {
-      padding: 14px;
-      margin: 10px 0;
-      font-size: 16px;
-      font-weight: bold;
-      color: #fff;
-      background-color: #007BFF;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    .btn:disabled {
-      background-color: #aaa;
-      cursor: not-allowed;
-    }
-    .btn:hover {
-      background-color: #0056b3;
-    }
-    /* Tombol Scan Ulang */
-    #retry-button {
-      display: none;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #fff;
-      background-color: #dc3545;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      margin-top: 10px;
-    }
-    #retry-button:hover {
-      background-color: #c82333;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background-color: #fefefe;
-      border-radius: 12px;
-      padding: 20px;
-      width: 90%;
-      max-width: 400px;
+
+    /* Gaya dasar tiap tile */
+    .metro-tile {
       position: relative;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      animation: fadeIn 0.3s;
-      text-align: center;
-    }
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(-50px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-    .modal-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 10px;
-    }
-    .modal-header h2 {
-      margin: 0;
-      font-size: 20px;
-      color: #333;
-    }
-    .close-button {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      color: #aaa;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-    }
-    .close-button:hover,
-    .close-button:focus {
-      color: #000;
-      text-decoration: none;
-    }
-    .modal-body {
-      margin-bottom: 20px;
-      font-size: 16px;
-      color: #555;
-    }
-    .modal-footer {
+      justify-content: center;
+      font-size: 1.1rem;
+      text-transform: uppercase;
       text-align: center;
-    }
-    .modal-footer button {
-      padding: 10px 20px;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #fff;
-      background-color: #007BFF;
-      border: none;
+      color: var(--text-color);
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      overflow: hidden;
+      border-radius: 4px;
+      transition: opacity 0.2s, transform 0.2s;
     }
-    .modal-footer button:hover {
-      background-color: #0056b3;
+    .metro-tile:hover {
+      opacity: var(--tile-hover-opacity);
+      transform: translateY(-4px);
     }
+
+    /* Warna masing-masing tile */
+    .tile-1 { background: var(--tile-bg-1); }
+    .tile-2 { background: var(--tile-bg-2); }
+    .tile-3 { background: var(--tile-bg-3); }
+    .tile-4 { background: var(--tile-bg-4); }
+
+    /* Ikon sederhana (bisa diganti dengan <img> atau icon font) */
+    .metro-tile::before {
+      content: attr(data-icon);
+      font-size: 2.5rem;
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      opacity: 0.3;
+    }
+
+    /* Responsive: tile membesar di layar kecil */
     @media (max-width: 400px) {
-      .container {
-        width: 95%;
-        padding: 20px;
-      }
-      .btn, #retry-button {
-        font-size: 14px;
-        padding: 12px;
-      }
-      #password-input {
-        font-size: 14px;
-        padding: 10px;
-      }
-      .modal-content {
-        padding: 15px;
-      }
-      .modal-header h2 {
-        font-size: 18px;
-      }
-      .modal-body {
-        font-size: 14px;
-      }
-      .modal-footer button {
-        font-size: 14px;
-        padding: 10px 18px;
+      .metro-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, 120px);
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Menu Utama</h1>
-    <!-- Bagian input QR tidak ditampilkan -->
-    <div id="qr-input-container">
-      <label for="qr-input">Scan QR Code:</label>
-      <input type="text" id="qr-input" placeholder="Tempelkan QR Code disini" readonly>
+
+  <div class="metro-container">
+    <div class="metro-tile tile-1" data-icon="🏃" onclick="alert('html run diklik!')">
+      html run
     </div>
-    
-    <video id="qr-video" autoplay playsinline></video>
-    <!-- Elemen untuk menampilkan snapshot hasil scan -->
-    <img id="scanned-snapshot" alt="Snapshot Scan">
-    
-    <div id="scan-message">Pindai QR Code untuk melanjutkan</div>
-    <div id="error-message">Terjadi kesalahan. Silakan coba lagi.</div>
-    
-    <div id="password-prompt">
-      <label for="password-input">Masukkan Password:</label>
-      <input type="password" id="password-input" placeholder="Masukkan password">
-      <button id="password-submit">Submit</button>
+    <div class="metro-tile tile-2" data-icon="📂" onclick="window.location.href='data.html'">
+      Files
     </div>
-    
-    <div class="button-group">
-      <button id="open-camera-button" class="btn">Buka Kamera</button>
-      <button id="open-gallery-button" class="btn">Pilih dari Galeri</button>
-      <button id="enkripsi-button" class="btn" disabled onclick="window.open('enkripsi.html', '_blank')">Enkripsi File</button>
-      <button id="data-button" class="btn" disabled onclick="window.open('data.html', '_blank')">Lihat Data</button>
+    <div class="metro-tile tile-3" data-icon="⚙️" onclick="alert('Settings diklik!')">
+      Settings
     </div>
-    <!-- Tombol Scan Ulang -->
-    <button id="retry-button">Scan Ulang</button>
-    
-    <div id="qr-permission-modal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Izin Kamera Diperlukan</h2>
-          <button class="close-button" id="close-permission-modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          Aplikasi ini memerlukan izin untuk mengakses kamera Anda guna memindai QR Code. Mohon izinkan akses kamera di pengaturan perangkat Anda.
-        </div>
-        <div class="modal-footer">
-          <button id="permission-ok-button">OK</button>
-        </div>
-      </div>
-    </div>
-    
-    <div id="general-error-modal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Error</h2>
-          <button id="close-general-error-modal" class="close-button">&times;</button>
-        </div>
-        <div class="modal-body" id="general-error-message-content">
-          Terjadi kesalahan.
-        </div>
-        <div class="modal-footer">
-          <button id="general-error-ok-button">OK</button>
-        </div>
-      </div>
+    <div class="metro-tile tile-4" data-icon="❓" onclick="alert('Help diklik!')">
+      Help
     </div>
   </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
-  <script>
-    let videoStream = null;
-    let scanning = true;
-    const video = document.getElementById('qr-video');
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    const scanMessage = document.getElementById('scan-message');
-    const errorMessage = document.getElementById('error-message');
-    const scannedSnapshot = document.getElementById('scanned-snapshot');
-    const passwordPrompt = document.getElementById('password-prompt');
-    const passwordInput = document.getElementById('password-input');
-    const passwordSubmit = document.getElementById('password-submit');
-    const enkripsiButton = document.getElementById('enkripsi-button');
-    const dataButton = document.getElementById('data-button');
-    const openCameraButton = document.getElementById('open-camera-button');
-    const openGalleryButton = document.getElementById('open-gallery-button');
-    const retryButton = document.getElementById('retry-button');
-    
-    const qrPermissionModal = document.getElementById('qr-permission-modal');
-    const closePermissionModal = document.getElementById('close-permission-modal');
-    const permissionOkButton = document.getElementById('permission-ok-button');
-    
-    const generalErrorModal = document.getElementById('general-error-modal');
-    const closeGeneralErrorModal = document.getElementById('close-general-error-modal');
-    const generalErrorMessageContent = document.getElementById('general-error-message-content');
-    const generalErrorOkButton = document.getElementById('general-error-ok-button');
-    
-    // Password untuk dekripsi
-    const DECRYPTION_KEY = 'dakota775';
-    const TARGET_TEXT = "ahmadsidikmuttaqin";
-    
-    function showError(message) {
-      errorMessage.textContent = message;
-      errorMessage.style.display = 'block';
-      // Tampilkan tombol scan ulang jika terjadi error
-      retryButton.style.display = 'block';
-    }
-    
-    function hideError() {
-      errorMessage.style.display = 'none';
-      errorMessage.textContent = '';
-      retryButton.style.display = 'none';
-    }
-    
-    function showGeneralErrorModal(message) {
-      generalErrorMessageContent.textContent = message;
-      generalErrorModal.style.display = 'flex';
-    }
-    
-    function hideGeneralErrorModal() {
-      generalErrorModal.style.display = 'none';
-      generalErrorMessageContent.textContent = '';
-    }
-    
-    function decryptAES(encryptedText, key) {
-      try {
-        const bytes = CryptoJS.AES.decrypt(encryptedText, key);
-        const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
-        return decryptedText;
-      } catch (e) {
-        console.error("Decryption error:", e);
-        return null;
-      }
-    }
-    
-    // Fungsi validasi menggunakan decryptAES
-    function validateQRCode(qrCodeData) {
-      const decryptedText = decryptAES(qrCodeData, DECRYPTION_KEY);
-      if (decryptedText === TARGET_TEXT) {
-        scanMessage.textContent = 'QR Code valid. Silakan lanjutkan.';
-        scanMessage.style.color = 'green';
-        enkripsiButton.disabled = false;
-        dataButton.disabled = false;
-        passwordPrompt.style.display = 'none';
-        return true;
-      } else {
-        showGeneralErrorModal('QR Code tidak valid atau rusak. Silakan coba lagi.');
-        return false;
-      }
-    }
-    
-    // Fungsi memproses scan dan mengambil snapshot jika valid,
-    // kemudian kamera dimatikan secara otomatis
-    function processQRCode(qrCodeData) {
-      if (!qrCodeData) {
-        showGeneralErrorModal('Tidak ada QR Code yang terdeteksi.');
-        return;
-      }
-      if (!scanning) return;
-      if (validateQRCode(qrCodeData)) {
-        // Ambil snapshot dari canvas dan tampilkan
-        const snapshotDataUrl = canvas.toDataURL("image/png");
-        scannedSnapshot.src = snapshotDataUrl;
-        scannedSnapshot.style.display = 'block';
-        scanning = false;
-        // Matikan kamera secara otomatis setelah scan berhasil
-        stopCamera();
-      }
-    }
-    
-    function readQRCode() {
-      if (videoStream && scanning) {
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          context.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height);
-          if (code) {
-            processQRCode(code.data);
-          } else {
-            requestAnimationFrame(readQRCode);
-          }
-        } else {
-          requestAnimationFrame(readQRCode);
-        }
-      }
-    }
-    
-    function startCamera() {
-      hideError();
-      scanning = true;
-      // Sembunyikan snapshot jika ada hasil scan sebelumnya
-      scannedSnapshot.style.display = 'none';
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-        .then(stream => {
-          videoStream = stream;
-          video.srcObject = stream;
-          video.addEventListener('loadedmetadata', () => {
-            video.play();
-            readQRCode();
-          });
-          scanMessage.textContent = 'Pindai QR Code...';
-          scanMessage.style.color = '#28a745';
-          openCameraButton.textContent = 'Tutup Kamera';
-          openGalleryButton.disabled = true;
-          retryButton.style.display = 'none';
-        })
-        .catch(err => {
-          console.error('Error accessing camera:', err);
-          if (err.name === 'NotAllowedError') {
-            qrPermissionModal.style.display = 'flex';
-          } else {
-            showGeneralErrorModal('Gagal mengakses kamera. Pastikan kamera Anda berfungsi dan izin akses kamera diberikan.');
-          }
-        });
-    }
-    
-    function stopCamera() {
-      if (videoStream) {
-        videoStream.getTracks().forEach(track => track.stop());
-        videoStream = null;
-        video.srcObject = null;
-        openCameraButton.textContent = 'Buka Kamera';
-        openGalleryButton.disabled = false;
-      }
-    }
-    
-    openCameraButton.addEventListener('click', () => {
-      if (videoStream) {
-        stopCamera();
-      } else {
-        startCamera();
-      }
-    });
-    
-    openGalleryButton.addEventListener('click', () => {
-      hideError();
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const img = new Image();
-          img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            context.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            const code = jsQR(imageData.data, imageData.width, imageData.height);
-            if (code) {
-              processQRCode(code.data);
-            } else {
-              showGeneralErrorModal('Tidak ada QR Code yang terdeteksi pada gambar.');
-            }
-          };
-          img.onerror = () => {
-            showGeneralErrorModal('Gagal memuat gambar.');
-          };
-          img.src = event.target.result;
-        };
-        reader.onerror = () => {
-          showGeneralErrorModal('Gagal membaca file.');
-        };
-        reader.readAsDataURL(file);
-      };
-      input.click();
-    });
-    
-    passwordSubmit.addEventListener('click', () => {
-      const password = passwordInput.value;
-      if (password === DECRYPTION_KEY) {
-        scanMessage.textContent = 'Password benar. Silakan lanjutkan.';
-        scanMessage.style.color = 'green';
-        enkripsiButton.disabled = false;
-        dataButton.disabled = false;
-        passwordPrompt.style.display = 'none';
-        scanning = false;
-        stopCamera();
-      } else {
-        showGeneralErrorModal('Password salah. Silakan coba lagi.');
-        passwordInput.value = '';
-      }
-    });
-    
-    closePermissionModal.addEventListener('click', () => {
-      qrPermissionModal.style.display = 'none';
-    });
-    
-    permissionOkButton.addEventListener('click', () => {
-      qrPermissionModal.style.display = 'none';
-      startCamera();
-    });
-    
-    closeGeneralErrorModal.addEventListener('click', hideGeneralErrorModal);
-    generalErrorOkButton.addEventListener('click', hideGeneralErrorModal);
-    
-    // Tombol Scan Ulang untuk mengulangi scanning
-    retryButton.addEventListener('click', () => {
-      hideError();
-      scanning = true;
-      readQRCode();
-      retryButton.style.display = 'none';
-      scanMessage.textContent = 'Pindai QR Code...';
-    });
-    
-    function hasCamera() {
-      return new Promise((resolve) => {
-        navigator.mediaDevices.enumerateDevices()
-          .then(devices => {
-            const hasCamera = devices.some(device => device.kind === 'videoinput');
-            resolve(hasCamera);
-          })
-          .catch(() => {
-            resolve(false);
-          });
-      });
-    }
-    
-    async function initialize() {
-      const hasCameraCapability = await hasCamera();
-      if (!hasCameraCapability) {
-        openCameraButton.style.display = 'none';
-        openGalleryButton.style.display = 'block';
-        showGeneralErrorModal('Perangkat Anda tidak memiliki kamera. Silakan pilih gambar dari galeri.');
-      } else {
-        openCameraButton.style.display = 'block';
-        openGalleryButton.style.display = 'block';
-      }
-    }
-    
-    initialize();
-  </script>
+
 </body>
 </html>
