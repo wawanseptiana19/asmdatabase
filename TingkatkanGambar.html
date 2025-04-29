@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Enhancer Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen font-inter">
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-gray-800 mb-2"></h1>
+      <p class="text-gray-600"></p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+      <!-- Upload Section -->
+      <div class="mb-10">
+        <label class="flex flex-col items-center justify-center w-full h-64 border-4 border-dashed border-blue-100 rounded-2xl hover:border-blue-300 transition-colors cursor-pointer bg-gray-50">
+          <input type="file" accept="image/*" id="imageUpload" class="hidden">
+          <div class="text-center">
+            <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-4"></i>
+            <p class="text-gray-600 font-medium">Seret & Lepas Gambar</p>
+            <p class="text-gray-400 text-sm mt-1">atau klik untuk memilih file</p>
+          </div>
+        </label>
+      </div>
+
+      <!-- Controls Section -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Dimension Inputs -->
+        <div class="space-y-6">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Lebar (px)</label>
+              <input id="widthInput" type="number" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Tinggi (px)</label>
+              <input id="heightInput" type="number" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Lebar (cm)</label>
+              <input id="widthInputCm" type="number" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Tinggi (cm)</label>
+              <input id="heightInputCm" type="number" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+            </div>
+          </div>
+        </div>
+
+        <!-- Preset Buttons -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-4">Resolusi Preset</label>
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="setResolution(1920)" class="px-4 py-3 bg-white border-2 border-blue-100 rounded-xl hover:border-blue-400 transition-colors font-medium text-gray-700">
+              <i class="fas fa-expand-alt mr-2 text-blue-500"></i>2K
+            </button>
+            <button onclick="setResolution(3840)" class="px-4 py-3 bg-white border-2 border-blue-100 rounded-xl hover:border-blue-400 transition-colors font-medium text-gray-700">
+              <i class="fas fa-expand-alt mr-2 text-blue-500"></i>4K
+            </button>
+            <button onclick="setResolution(5760)" class="px-4 py-3 bg-white border-2 border-blue-100 rounded-xl hover:border-blue-400 transition-colors font-medium text-gray-700">
+              <i class="fas fa-expand-alt mr-2 text-blue-500"></i>6K
+            </button>
+            <button onclick="setResolution(7680)" class="px-4 py-3 bg-white border-2 border-blue-100 rounded-xl hover:border-blue-400 transition-colors font-medium text-gray-700">
+              <i class="fas fa-expand-alt mr-2 text-blue-500"></i>8K
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compression Settings -->
+      <div class="mb-8">
+        <label class="block text-sm font-medium text-gray-700 mb-4">Pengaturan Kompresi</label>
+        <div class="flex items-center gap-4">
+          <div class="flex-1">
+            <input type="range" id="compressionSlider" min="0" max="100" value="100" 
+                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+          </div>
+          <div class="w-20 text-right">
+            <span id="compressionValue" class="text-gray-700 font-medium">100%</span>
+          </div>
+        </div>
+        <p class="text-gray-500 text-sm mt-2">Kualitas: <span class="font-medium" id="qualityLabel">Tinggi</span></p>
+      </div>
+
+      <!-- Format Selection -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Format Gambar</label>
+        <select id="formatSelect" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+          <option value="jpg">JPG</option>
+          <option value="png">PNG</option>
+        </select>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-3 mb-8">
+        <button id="sharpenButton" class="flex-1 px-6 py-3.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white font-semibold shadow-md transition-all">
+          <i class="fas fa-magic mr-2"></i>Tingkatkan Kualitas
+        </button>
+      </div>
+
+      <!-- Processing Animation -->
+      <div id="processingAnimation" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-2xl text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p class="text-gray-700 font-semibold">Memproses gambar...</p>
+        </div>
+      </div>
+
+      <!-- Image Comparison -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Original Image -->
+        <div id="originalContainer" class="bg-gray-50 p-5 rounded-xl border border-gray-200" style="display: none;">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-gray-700">Original</h3>
+            <span class="text-sm text-gray-500"><i class="fas fa-info-circle mr-2"></i>Before</span>
+          </div>
+          <img id="originalImage" class="w-full h-auto rounded-lg shadow-sm border border-gray-200">
+          <div class="mt-4 space-y-1 text-sm">
+            <p id="originalSize" class="text-gray-600"><i class="fas fa-weight-hanging mr-2"></i>Ukuran: N/A</p>
+            <p id="originalDimensions" class="text-gray-600"><i class="fas fa-ruler-combined mr-2"></i>Dimensi: N/A</p>
+          </div>
+        </div>
+
+        <!-- Processed Image -->
+        <div id="sharpenedContainer" class="bg-gray-50 p-5 rounded-xl border border-gray-200" style="display: none;">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-gray-700">Hasil</h3>
+            <span class="text-sm text-gray-500"><i class="fas fa-sparkles mr-2"></i>After</span>
+          </div>
+          <img id="processedImage" class="w-full h-auto rounded-lg shadow-sm border border-gray-200">
+          <div class="mt-4 space-y-3">
+            <button id="denoiseButton" class="w-full px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 rounded-lg text-white font-medium shadow-md transition-all">
+              <i class="fas fa-filter mr-2"></i>Hapus Noise
+            </button>
+            <button id="downloadButton" class="w-full px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-lg text-white font-medium shadow-md transition-all">
+              <i class="fas fa-download mr-2"></i>Download Hasil
+            </button>
+          </div>
+          <div class="mt-4 space-y-1 text-sm">
+            <p id="sharpenedSize" class="text-gray-600"><i class="fas fa-weight-hanging mr-2"></i>Ukuran: N/A</p>
+            <p id="sharpenedDimensions" class="text-gray-600"><i class="fas fa-ruler-combined mr-2"></i>Dimensi: N/A</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const imageUpload = document.getElementById("imageUpload");
+    const sharpenButton = document.getElementById("sharpenButton");
+    const denoiseButton = document.getElementById("denoiseButton");
+    const originalImage = document.getElementById("originalImage");
+    const processedImage = document.getElementById("processedImage");
+    const sharpenedContainer = document.getElementById("sharpenedContainer");
+    const downloadButton = document.getElementById("downloadButton");
+    const widthInput = document.getElementById("widthInput");
+    const heightInput = document.getElementById("heightInput");
+    const widthInputCm = document.getElementById("widthInputCm");
+    const heightInputCm = document.getElementById("heightInputCm");
+    const processingAnimation = document.getElementById("processingAnimation");
+    const compressionSlider = document.getElementById("compressionSlider");
+    const compressionValue = document.getElementById("compressionValue");
+    const qualityLabel = document.getElementById("qualityLabel");
+    const formatSelect = document.getElementById("formatSelect");
+    const dpi = 96;
+
+    let uploadedImage = null;
+    let currentProcessedURL = null;
+
+    // Inisialisasi event listener download sekali saja
+    downloadButton.addEventListener('click', () => {
+      if (currentProcessedURL) {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const quality = compressionSlider.value;
+        const format = formatSelect.value; // Get selected format
+        const link = document.createElement("a");
+        link.download = `enhanced-image-${timestamp}-q${quality}.${format}`; // Use selected format
+        link.href = currentProcessedURL;
+        link.click();
+      }
+    });
+
+    compressionSlider.addEventListener("input", function() {
+      const value = this.value;
+      compressionValue.textContent = `${value}%`;
+      qualityLabel.textContent = value >= 80 ? "Tinggi" : value >= 50 ? "Sedang" : "Rendah";
+    });
+
+    function cmToPx(cm) {
+      return Math.round((cm / 2.54) * dpi);
+    }
+
+    function pxToCm(px) {
+      return (px * 2.54) / dpi;
+    }
+
+    function setResolution(newWidth) {
+      if (uploadedImage) {
+        const aspectRatio = uploadedImage.width / uploadedImage.height;
+        const newHeight = Math.round(newWidth / aspectRatio);
+        widthInput.value = newWidth;
+        heightInput.value = newHeight;
+        widthInputCm.value = pxToCm(newWidth).toFixed(2);
+        heightInputCm.value = pxToCm(newHeight).toFixed(2);
+      }
+    }
+
+    function updateDimensionsFromCm() {
+      const widthCm = parseFloat(widthInputCm.value) || 0;
+      const heightCm = parseFloat(heightInputCm.value) || 0;
+      widthInput.value = cmToPx(widthCm);
+      heightInput.value = cmToPx(heightCm);
+    }
+
+    function updateDimensionsFromPx() {
+      const widthPx = parseInt(widthInput.value) || 0;
+      const heightPx = parseInt(heightInput.value) || 0;
+      widthInputCm.value = pxToCm(widthPx).toFixed(2);
+      heightInputCm.value = pxToCm(heightPx).toFixed(2);
+    }
+
+    imageUpload.addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          originalImage.src = e.target.result;
+          uploadedImage = new Image();
+          uploadedImage.src = e.target.result;
+          uploadedImage.onload = function () {
+            document.getElementById("originalContainer").style.display = "block";
+            document.getElementById("originalSize").textContent = `Ukuran Asli: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+            document.getElementById("originalDimensions").textContent = `Dimensi Asli: ${uploadedImage.width} x ${uploadedImage.height}`;
+            widthInput.value = uploadedImage.width;
+            heightInput.value = uploadedImage.height;
+            widthInputCm.value = pxToCm(uploadedImage.width).toFixed(2);
+            heightInputCm.value = pxToCm(uploadedImage.height).toFixed(2);
+          };
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    widthInput.addEventListener("input", updateDimensionsFromPx);
+    heightInput.addEventListener("input", updateDimensionsFromPx);
+    widthInputCm.addEventListener("input", updateDimensionsFromCm);
+    heightInputCm.addEventListener("input", updateDimensionsFromCm);
+
+    const processingCanvas = document.createElement('canvas');
+    const processingCtx = processingCanvas.getContext('2d');
+
+    async function processImage(processFunction) {
+      if (!uploadedImage) {
+        alert("Silahkan upload gambar terlebih dahulu!");
+        return;
+      }
+
+      showProcessingAnimation();
+
+      try {
+        const newWidth = parseInt(widthInput.value) || cmToPx(parseFloat(widthInputCm.value) || 0);
+        const newHeight = parseInt(heightInput.value) || cmToPx(parseFloat(heightInputCm.value) || 0);
+
+        processingCanvas.width = newWidth;
+        processingCanvas.height = newHeight;
+        processingCtx.drawImage(uploadedImage, 0, 0, newWidth, newHeight);
+
+        await processFunction(processingCtx, processingCanvas);
+
+        const quality = compressionSlider.value / 100;
+        currentProcessedURL = processingCanvas.toDataURL(formatSelect.value === 'png' ? 'image/png' : 'image/jpeg', quality);
+        
+        processedImage.src = currentProcessedURL;
+        document.getElementById("sharpenedSize").textContent = 
+          `Ukuran: ${(currentProcessedURL.length / 1024 / 1024).toFixed(2)} MB`;
+        document.getElementById("sharpenedDimensions").textContent = 
+          `Dimensi: ${newWidth} x ${newHeight}`;
+
+        sharpenedContainer.style.display = "block";
+        downloadButton.disabled = false;
+
+      } catch (error) {
+        console.error("Error processing image:", error);
+        alert("Terjadi kesalahan saat memproses gambar");
+      } finally {
+        hideProcessingAnimation();
+      }
+    }
+
+    function showProcessingAnimation() {
+      processingAnimation.classList.remove("hidden");
+    }
+
+    function hideProcessingAnimation() {
+      processingAnimation.classList.add("hidden");
+    }
+
+    // Handler untuk Sharpen
+    sharpenButton.addEventListener("click", () => {
+      processImage((ctx) => {
+        const imageData = ctx.getImageData(0, 0, processingCanvas.width, processingCanvas.height);
+        const sharpenKernel = [0, -1, 0, -1, 5, -1, 0, -1, 0];
+        const sharpenedData = applyConvolution(imageData, sharpenKernel);
+        ctx.putImageData(sharpenedData, 0, 0);
+      });
+    });
+
+    // Handler untuk Denoise
+    denoiseButton.addEventListener("click", () => {
+      processImage((ctx) => {
+        const imageData = ctx.getImageData(0, 0, processingCanvas.width, processingCanvas.height);
+        const blurKernel = [
+          1 / 16, 2 / 16, 1 / 16,
+          2 / 16, 4 / 16, 2 / 16,
+          1 / 16, 2 / 16, 1 / 16
+        ];
+        const denoisedData = applyConvolution(imageData, blurKernel);
+        ctx.putImageData(denoisedData, 0, 0);
+      });
+    });
+
+    function applyConvolution(imageData, kernel) {
+      const side = Math.sqrt(kernel.length);
+      const halfSide = Math.floor(side / 2);
+      const { width, height } = imageData;
+      const output = new ImageData(width, height);
+      const { data: srcData } = imageData;
+      const { data: dstData } = output;
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          let r = 0, g = 0, b = 0, a = 0;
+          const dstOff = (y * width + x) * 4;
+          for (let kernelY = 0; kernelY < side; kernelY++) {
+            for (let kernelX = 0; kernelX < side; kernelX++) {
+              const scy = Math.min(height - 1, Math.max(0, y + kernelY - halfSide));
+              const scx = Math.min(width - 1, Math.max(0, x + kernelX - halfSide));
+              const srcOff = (scy * width + scx) * 4;
+              const wt = kernel[kernelY * side + kernelX];
+              r += srcData[srcOff] * wt;
+              g += srcData[srcOff + 1] * wt;
+              b += srcData[srcOff + 2] * wt;
+              a += srcData[srcOff + 3] * wt;
+            }
+          }
+          dstData[dstOff] = r;
+          dstData[dstOff + 1] = g;
+          dstData[dstOff + 2] = b;
+          dstData[dstOff + 3] = a;
+        }
+      }
+      return output;
+    }
+  </script>
+</body>
+</html>
