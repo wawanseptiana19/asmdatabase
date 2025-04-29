@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Steganografi: Enkripsi dan Dekripsi File ke Media</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    .transition-all { transition: all 0.3s ease; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-200 to-gray-400 font-roboto min-h-screen flex flex-col">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-lg">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-blue-600">Steganografi</h1>
+      <span class="text-gray-700">Enkripsi & Dekripsi File ke Media</span>
+    </div>
+  </nav>
+
+  <main class="container mx-auto p-6 flex-grow">
+    <div class="bg-white rounded-lg shadow-2xl p-8">
+      <div class="grid gap-6">
+        <!-- Input enkripsi -->
+        <div class="space-y-2">
+          <label class="block text-lg font-medium">Pilih Media</label>
+          <input type="file" id="mediaInput" accept="video/*,audio/*,image/*,*/*"
+            class="block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="space-y-2">
+          <label class="block text-lg font-medium">Pilih File</label>
+          <input type="file" id="fileInput" accept="*/*"
+            class="block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <button id="embedButton"
+          class="w-full flex items-center justify-center bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition-all">
+          <i class="fas fa-lock mr-2"></i> Sisipkan File
+        </button>
+        <!-- Preview hasil enkripsi -->
+        <div class="space-y-4">
+          <video id="outputVideo" controls class="hidden w-full rounded shadow-lg"></video>
+          <audio id="outputAudio" controls class="hidden w-full rounded shadow-lg"></audio>
+          <img id="outputImage" class="hidden w-full rounded shadow-lg" alt="Encrypted">
+          <iframe id="outputPDF" class="hidden w-full rounded shadow-lg" style="height:300px;"></iframe>
+          <a id="downloadLink" class="hidden block text-center bg-green-600 text-white py-3 rounded-md hover:bg-green-700 transition-all">
+            <i class="fas fa-download mr-2"></i> Download
+          </a>
+        </div>
+
+        <!-- Input dekripsi -->
+        <div class="space-y-2">
+          <label class="block text-lg font-medium">Pilih Media Terenkripsi</label>
+          <input type="file" id="encryptedMediaInput" accept="*/*"
+            class="block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <button id="decryptButton"
+          class="w-full flex items-center justify-center bg-red-600 text-white py-3 rounded-md hover:bg-red-700 transition-all">
+          <i class="fas fa-unlock mr-2"></i> Dekripsi File
+        </button>
+
+        <!-- Pilih format & preview dekripsi -->
+        <div id="fileFormatSelection" class="hidden space-y-2">
+          <label class="block text-lg font-medium">Format Hasil</label>
+          <select id="fileFormat"
+            class="block w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Pilih...</option>
+            <option value="zip">ZIP</option>
+            <option value="rar">RAR</option>
+            <option value="txt">TXT</option>
+            <option value="jpg">JPG</option>
+            <option value="png">PNG</option>
+            <option value="mp3">MP3</option>
+            <option value="mp4">MP4</option>
+            <option value="docx">DOCX</option>
+            <option value="doc">DOC</option>
+            <option value="pdf">PDF</option>
+          </select>
+        </div>
+        <div class="space-y-4">
+          <!-- Preview kecil: max-w-1/3 -->
+          <video id="decryptedVideo" controls class="hidden max-w-1/3 w-full rounded shadow-lg"></video>
+          <img id="decryptedImage" class="hidden max-w-1/3 w-full rounded shadow-lg" alt="Decrypted">
+          <a id="downloadFileLink" class="hidden block text-center bg-green-600 text-white py-3 rounded-md hover:bg-green-700 transition-all">
+            <i class="fas fa-download mr-2"></i> Download
+          </a>
+        </div>
+
+        <div id="statusMessage" class="hidden text-center text-lg font-medium"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-white shadow-inner">
+    <div class="container mx-auto px-4 py-4 text-center text-gray-600">
+      &copy; 2025 - Steganografi, Inc.
+    </div>
+  </footer>
+
+  <script>
+    let fileName = '';
+
+    function showMessage(msg, isError) {
+      const el = document.getElementById('statusMessage');
+      el.textContent = msg;
+      el.className = 'text-center text-lg font-medium transition-all ' + (isError ? 'text-red-500' : 'text-green-500');
+      el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 5000);
+    }
+
+    function readFileAsArrayBuffer(file) {
+      return new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = e => res(e.target.result);
+        r.onerror = e => rej(new Error(e.target.error.message));
+        r.readAsArrayBuffer(file);
+      });
+    }
+
+    function getMimeType(ext) {
+      const m = {
+        jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png',
+        txt:'text/plain', pdf:'application/pdf',
+        mp3:'audio/mpeg', mp4:'video/mp4',
+        zip:'application/zip', rar:'application/x-rar-compressed',
+        doc:'application/msword', docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      };
+      return m[ext]||'application/octet-stream';
+    }
+
+    document.getElementById('embedButton').onclick = async () => {
+      const media = document.getElementById('mediaInput').files[0];
+      const file = document.getElementById('fileInput').files[0];
+      if (!media||!file) return showMessage('Pilih media dan file!', true);
+      try {
+        const mBuf = await readFileAsArrayBuffer(media);
+        const fBuf = await readFileAsArrayBuffer(file);
+        const combined = new Uint8Array(mBuf.byteLength + fBuf.byteLength + 4);
+        combined.set(new Uint8Array(mBuf), 0);
+        combined.set(new Uint8Array(fBuf), mBuf.byteLength);
+        const size = fBuf.byteLength;
+        combined.set([
+          (size>>24)&0xFF, (size>>16)&0xFF, (size>>8)&0xFF, size&0xFF
+        ], mBuf.byteLength + fBuf.byteLength);
+        const blob = new Blob([combined], { type: media.type });
+        const url = URL.createObjectURL(blob);
+        // sembunyikan semua output
+        ['outputVideo','outputAudio','outputImage','outputPDF','downloadLink'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+        if (media.type.startsWith('video/')) {
+          const v = document.getElementById('outputVideo');
+          v.src=url; v.classList.remove('hidden');
+        } else if (media.type.startsWith('audio/')) {
+          const a = document.getElementById('outputAudio');
+          a.src=url; a.classList.remove('hidden');
+        } else if (media.type.startsWith('image/')) {
+          const i = document.getElementById('outputImage');
+          i.src=url; i.classList.remove('hidden');
+        } else if (media.type==='application/pdf') {
+          const f = document.getElementById('outputPDF');
+          f.src=url; f.classList.remove('hidden');
+        } else {
+          const dl = document.getElementById('downloadLink');
+          dl.href=url; dl.classList.remove('hidden');
+        }
+        showMessage('Enkripsi selesai!', false);
+      } catch (e) {
+        showMessage('Error: '+e.message, true);
+      }
+    };
+
+    document.getElementById('decryptButton').onclick = () => {
+      const enc = document.getElementById('encryptedMediaInput').files[0];
+      if (!enc) return showMessage('Pilih file terenkripsi!', true);
+      document.getElementById('fileFormatSelection').classList.remove('hidden');
+    };
+
+    document.getElementById('fileFormat').onchange = async function() {
+      const fmt = this.value;
+      if (!fmt) return;
+      try {
+        const enc = document.getElementById('encryptedMediaInput').files[0];
+        const buf = await readFileAsArrayBuffer(enc);
+        const u8 = new Uint8Array(buf);
+        const size = (u8[u8.length-4]<<24)|(u8[u8.length-3]<<16)|(u8[u8.length-2]<<8)|u8[u8.length-1];
+        if (size<=0||size>buf.byteLength-4) throw new Error('Tidak ada file.');
+        const start = buf.byteLength-4-size;
+        const fBuf = buf.slice(start, buf.byteLength-4);
+        const blob = new Blob([fBuf], { type: getMimeType(fmt) });
+        const url = URL.createObjectURL(blob);
+        // sembunyikan preview lama
+        document.getElementById('decryptedVideo').classList.add('hidden');
+        document.getElementById('decryptedImage').classList.add('hidden');
+        // tampilkan preview kecil
+        if (fmt==='mp4') {
+          const v = document.getElementById('decryptedVideo');
+          v.src=url; v.classList.remove('hidden');
+        } else if (['jpg','jpeg','png'].includes(fmt)) {
+          const i = document.getElementById('decryptedImage');
+          i.src=url; i.classList.remove('hidden');
+        }
+        const dl = document.getElementById('downloadFileLink');
+        dl.href=url; dl.classList.remove('hidden');
+        showMessage('Dekripsi selesai!', false);
+      } catch (e) {
+        showMessage('Error: '+e.message, true);
+      }
+    };
+  </script>
+</body>
+</html>
