@@ -11,6 +11,7 @@
       --tile-bg-2: #2b5797;
       --tile-bg-3: #da532c;
       --tile-bg-4: #ffc40d;
+      --tile-bg-5: #7e3878;
       --tile-hover-opacity: 0.8;
       --text-color: #fff;
       --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -32,11 +33,11 @@
       min-height: 100vh;
     }
 
-    /* Container grid 2x2 */
+    /* Container grid 3 kolom */
     .metro-container {
       display: grid;
-      grid-template-columns: repeat(2, 150px);
-      grid-template-rows: repeat(2, 150px);
+      grid-template-columns: repeat(3, 150px);
+      grid-auto-rows: 150px;
       gap: 16px;
     }
 
@@ -65,6 +66,7 @@
     .tile-2 { background: var(--tile-bg-2); }
     .tile-3 { background: var(--tile-bg-3); }
     .tile-4 { background: var(--tile-bg-4); }
+    .tile-5 { background: var(--tile-bg-5); }
 
     /* Ikon sederhana (bisa diganti dengan <img> atau icon font) */
     .metro-tile::before {
@@ -76,11 +78,10 @@
       opacity: 0.3;
     }
 
-    /* Responsive: tile membesar di layar kecil */
-    @media (max-width: 400px) {
+    /* Responsive */
+    @media (max-width: 500px) {
       .metro-container {
         grid-template-columns: 1fr;
-        grid-template-rows: repeat(4, 120px);
       }
     }
   </style>
@@ -99,6 +100,9 @@
     </div>
     <div class="metro-tile tile-4" data-icon="🖼️" onclick="window.location.href='TingkatkanGambar.html'">
       Tingkatkan Gambar
+    </div>
+    <div class="metro-tile tile-5" data-icon="🧬" onclick="window.location.href='Steganografi.html'">
+      Steganografi
     </div>
   </div>
 
