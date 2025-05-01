@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Steganografi File ke .wav dengan Password</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@tailwindcss/browser@latest"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Custom styles for waveform canvas */
+        canvas.waveform {
+            width: 100%;
+            height: 120px;
+            margin-top: 1.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 0.75rem;
+            background: #f7fafc;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        canvas.waveform:hover {
+            border-color: #90caf9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Dark mode styles */
+        .dark {
+            background-color: #1a202c;
+            color: #f7fafc;
+        }
+
+        .dark .bg-white {
+            background-color: #2d3748;
+        }
+
+        .dark .text-gray-700 {
+            color: #cbd5e0;
+        }
+
+        .dark .border-gray-200 {
+            border-color: #4a5568;
+        }
+
+        .dark input,
+        .dark button {
+            color: #f7fafc;
+        }
+
+        .dark input::placeholder {
+            color: #a0aec0;
+        }
+
+        .dark .bg-blue-500 {
+            background-color: #3182ce;
+        }
+
+        .dark .bg-blue-500:hover {
+            background-color: #2a69ac;
+        }
+
+        .dark .bg-purple-500 {
+            background-color: #805ad5;
+        }
+
+        .dark .bg-purple-500:hover {
+            background-color: #6b46c1;
+        }
+
+        .dark .bg-green-500 {
+            background-color: #38a169;
+        }
+
+        .dark .bg-green-500:hover {
+            background-color: #2d7a51;
+        }
+
+        .dark .bg-indigo-500 {
+            background-color: #4c51bf;
+        }
+
+        .dark .bg-indigo-500:hover {
+            background-color: #3d439e;
+        }
+
+        .dark canvas.waveform {
+            border-color: #4a5568;
+            background: #2d3748;
+        }
+
+        .dark canvas.waveform:hover {
+            border-color: #90caf9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-inter">
+    <div class="container mx-auto px-4 py-10">
+        <header class="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-center rounded-lg shadow-md py-6 px-4">
+            <h1 class="text-2xl font-semibold flex items-center justify-center">
+                <i class="fas fa-lock mr-2"></i> Steganografi File ke <strong class="font-bold">.wav</strong> dengan Password
+            </h1>
+        </header>
+
+        <section class="section bg-white rounded-lg shadow-md mt-8 py-6 px-6 border border-gray-200 transition-all duration-300 hover:shadow-lg hover:border-blue-200">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-file-upload mr-2 text-blue-500"></i> Enkripsi
+            </h2>
+            <div class="form-group mb-4">
+                <label for="fileInput" class="block text-gray-700 text-sm font-bold mb-2 flex items-center">
+                    <i class="fas fa-file mr-2"></i> Pilih File
+                </label>
+                <input type="file" id="fileInput" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+            </div>
+            <div class="form-group mb-4">
+                <label for="encPassword" class="block text-gray-700 text-sm font-bold mb-2 flex items-center">
+                    <i class="fas fa-key mr-2"></i> Password
+                </label>
+                <input type="password" id="encPassword" placeholder="Masukkan password..." class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+            </div>
+            <button id="encryptBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-semibold rounded-md py-3 px-6 focus:outline-none focus:shadow-outline transition duration-300 ease-in-out flex items-center justify-center">
+                <i class="fas fa-plus-circle mr-2"></i> Enkripsi ke WAV
+            </button>
+            <a id="downloadWav" class="download-link inline-block mt-4 bg-green-500 hover:bg-green-700 text-white font-semibold rounded-md py-3 px-6 text-center focus:outline-none focus:shadow-outline transition duration-300 ease-in-out flex items-center justify-center" style="display:none;">
+                <i class="fas fa-download mr-2"></i> Download WAV
+            </a>
+            <canvas id="encWaveform" class="waveform mt-4 transition-all duration-300" style="display:none;"></canvas>
+        </section>
+
+        <section class="section bg-white rounded-lg shadow-md mt-8 py-6 px-6 border border-gray-200 transition-all duration-300 hover:shadow-lg hover:border-purple-200">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-file-download mr-2 text-purple-500"></i> Dekripsi
+            </h2>
+            <div class="form-group mb-4">
+                <label for="wavInput" class="block text-gray-700 text-sm font-bold mb-2 flex items-center">
+                    <i class="fas fa-file-audio mr-2"></i> Pilih File WAV
+                </label>
+                <input type="file" id="wavInput" accept="audio/wav" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline transition-all duration-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500" />
+            </div>
+            <div class="form-group mb-4">
+                <label for="decPassword" class="block text-gray-700 text-sm font-bold mb-2 flex items-center">
+                    <i class="fas fa-key mr-2"></i> Password
+                </label>
+                <input type="password" id="decPassword" placeholder="Masukkan password..." class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline transition-all duration-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500" />
+            </div>
+            <canvas id="decWaveform" class="waveform mt-4 transition-all duration-300" style="display:none;"></canvas>
+            <button id="decryptBtn" class="bg-purple-500 hover:bg-purple-700 text-white font-semibold rounded-md py-3 px-6 focus:outline-none focus:shadow-outline transition duration-300 ease-in-out flex items-center justify-center">
+                <i class="fas fa-unlock-alt mr-2"></i> Dekripsi dari WAV
+            </button>
+            <a id="downloadFile" class="download-link inline-block mt-4 bg-indigo-500 hover:bg-indigo-700 text-white font-semibold rounded-md py-3 px-6 text-center focus:outline-none focus:shadow-outline transition duration-300 ease-in-out flex items-center justify-center" style="display:none;">
+                <i class="fas fa-file-download mr-2"></i> Download File
+            </a>
+            <div id="previewContainer" class="mt-6" style="display:none;">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                    <i class="fas fa-eye mr-2 text-indigo-500"></i> Preview:
+                </h3>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // ===================================================================
+        // Fungsi kriptografi
+        // ===================================================================
+        function deriveKey(password, length) {
+            const key = new Uint8Array(length);
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                hash = (hash + password.charCodeAt(i)) & 0xff;
+            }
+            for (let i = 0; i < length; i++) {
+                hash = (hash * 31 + i) & 0xff;
+                key[i] = hash;
+            }
+            return key;
+        }
+
+        function xorBuffer(buffer, key) {
+            const out = new Uint8Array(buffer.byteLength);
+            const src = new Uint8Array(buffer);
+            for (let i = 0; i < out.length; i++) {
+                out[i] = src[i] ^ key[i % key.length];
+            }
+            return out.buffer;
+        }
+
+        function arrayBufferToWav(buffer, sampleRate = 44100) {
+            const bytesPerSample = 1, numChannels = 1;
+            const blockAlign = numChannels * bytesPerSample;
+            const byteRate = sampleRate * blockAlign;
+            const dataSize = buffer.byteLength;
+            const wavBuf = new ArrayBuffer(44 + dataSize);
+            const view = new DataView(wavBuf);
+            let offset = 0;
+            function writeString(s) {
+                for (let i = 0; i < s.length; i++) view.setUint8(offset++, s.charCodeAt(i));
+            }
+            writeString('RIFF');
+            view.setUint32(offset, 36 + dataSize, true); offset += 4;
+            writeString('WAVE'); writeString('fmt ');
+            view.setUint32(offset, 16, true); offset += 4;
+            view.setUint16(offset, 1, true); offset += 2;
+            view.setUint16(offset, numChannels, true); offset += 2;
+            view.setUint32(offset, sampleRate, true); offset += 4;
+            view.setUint32(offset, byteRate, true); offset += 4;
+            view.setUint16(offset, blockAlign, true); offset += 2;
+            view.setUint16(offset, bytesPerSample * 8, true); offset += 2;
+            writeString('data');
+            view.setUint32(offset, dataSize, true); offset += 4;
+            const uint8arr = new Uint8Array(buffer);
+            for (let i = 0; i < dataSize; i++) view.setUint8(offset + i, uint8arr[i]);
+            return wavBuf;
+        }
+
+        function wavToArrayBuffer(wav) {
+            const data = new DataView(wav);
+            const dataSize = data.getUint32(40, true);
+            return wav.slice(44, 44 + dataSize);
+        }
+
+        // ===================================================================
+        // Fungsi audio visualizer
+        // ===================================================================
+        async function drawAudioSpectrum(arrayBuffer, canvas) {
+            const ctx = canvas.getContext('2d');
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            try {
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                const analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 2048; // Meningkatkan FFT size untuk detail waveform yang lebih baik
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+
+                const source = audioCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+
+                source.start();
+
+                function draw() {
+                    if (source.playbackState === source.PLAYING) {
+                        requestAnimationFrame(draw);
+                    }
+                    analyser.getByteTimeDomainData(dataArray); // Menggunakan getByteTimeDomainData
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#007bff';
+                    ctx.beginPath();
+                    ctx.lineWidth = 2;
+                    ctx.moveTo(0, canvas.height / 2);
+                    for (let i = 0; i < bufferLength; i++) {
+                        const v = dataArray[i] / 128.0;
+                        const y = v * canvas.height / 2;
+                        ctx.lineTo(i, y);
+                    }
+                    ctx.lineTo(canvas.width, canvas.height / 2);
+                    ctx.stroke();
+                }
+                draw();
+            } catch (e) {
+                console.error("Error decoding audio data: ", e);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#f44336';
+                ctx.font = '16px sans-serif';
+                ctx.fillText("Error: Invalid WAV File", 10, 50);
+            }
+        }
+
+        // ===================================================================
+        // Enkripsi
+        // ===================================================================
+        document.getElementById('encryptBtn').onclick = () => {
+            const pwd = document.getElementById('encPassword').value;
+            if (!pwd) {
+                alert('Masukkan password untuk enkripsi');
+                return;
+            }
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) {
+                alert('Pilih file dulu');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const buf = reader.result;
+                const key = deriveKey(pwd, buf.byteLength);
+                const enc = xorBuffer(buf, key);
+                const wavBuf = arrayBufferToWav(enc);
+                const link = document.getElementById('downloadWav');
+                link.href = URL.createObjectURL(new Blob([wavBuf], { type: 'audio/wav' }));
+                link.download = file.name + '.wav';
+                link.textContent = 'Download ' + link.download;
+                link.style.display = 'inline-block';
+                const canvas = document.getElementById('encWaveform');
+                canvas.style.display = 'block';
+                await drawAudioSpectrum(wavBuf, canvas);
+            };
+            reader.onerror = () => {
+                alert("Error reading file. Please try again.");
+                document.getElementById('encWaveform').style.display = 'none';
+                document.getElementById('downloadWav').style.display = 'none';
+            }
+            reader.readAsArrayBuffer(file);
+        };
+
+        // ===================================================================
+        // Dekripsi: waveform saat pilih file
+        // ===================================================================
+        document.getElementById('wavInput').addEventListener('change', async (e) => {
+            const wavFile = e.target.files[0];
+            const canvas = document.getElementById('decWaveform');
+            if (!wavFile) {
+                canvas.style.display = 'none';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const wavBuf = reader.result;
+                canvas.style.display = 'block';
+                await drawAudioSpectrum(wavBuf, canvas);
+            };
+            reader.onerror = () => {
+                alert("Error reading file. Please try again.");
+                document.getElementById('decWaveform').style.display = 'none';
+            }
+            reader.readAsArrayBuffer(wavFile);
+        });
+
+        // ===================================================================
+        // Dekripsi: tombol + preview
+        // ===================================================================
+        document.getElementById('decryptBtn').onclick = () => {
+            const pwd = document.getElementById('decPassword').value;
+            if (!pwd) {
+                alert('Masukkan password untuk dekripsi');
+                return;
+            }
+            const wavFile = document.getElementById('wavInput').files[0];
+            if (!wavFile) {
+                alert('Pilih WAV dulu');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const wavBuf = reader.result;
+                const encBuf = wavToArrayBuffer(wavBuf);
+                const key = deriveKey(pwd, encBuf.byteLength);
+                const decBuf = xorBuffer(encBuf, key);
+                const blob = new Blob([decBuf]);
+                const url = URL.createObjectURL(blob);
+
+                // Link download
+                const link = document.getElementById('downloadFile');
+                link.href = url;
+                link.download = 'decrypted_' + wavFile.name.replace(/\.wav$/i, '');
+                link.textContent = 'Download ' + link.download;
+                link.style.display = 'inline-block';
+
+                // Preview
+                const preview = document.getElementById('previewContainer');
+                preview.innerHTML = '<h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center"><i class="fas fa-eye mr-2 text-indigo-500"></i> Preview:</h3>';
+                preview.style.display = 'block';
+
+                // Deteksi magic number
+                const header = new Uint8Array(decBuf.slice(0, 8));
+                let elem;
+                // PNG
+                if (header[0] === 0x89 && header[1] === 0x50 && header[2] === 0x4E && header[3] === 0x47) {
+                    elem = document.createElement('img');
+                    elem.src = url;
+                    elem.classList.add("max-w-full", "rounded-md", "shadow-md");
+                }
+                // JPEG
+                else if (header[0] === 0xFF && header[1] === 0xD8 && header[2] === 0xFF) {
+                    elem = document.createElement('img');
+                    elem.src = url;
+                    elem.classList.add("max-w-full", "rounded-md", "shadow-md");
+                }
+                // MP4 (ftyp)
+                else if (
+                    header[4] === 0x66 && header[5] === 0x74 &&
+                    header[6] === 0x79 && header[7] === 0x70
+                ) {
+                    elem = document.createElement('video');
+                    elem.src = url;
+                    elem.controls = true;
+                    elem.classList.add("max-w-full", "rounded-md", "shadow-md");
+                }
+                // Teks fallback
+                else {
+                    const text = await new Response(blob).text();
+                    elem = document.createElement('pre');
+                    elem.textContent = text.slice(0, 1000) + (text.length > 1000 ? '\n…(truncated)' : '');
+                    elem.classList.add("whitespace-pre-wrap", "bg-gray-50", "p-4", "rounded-md", "max-h-48", "overflow-auto", "border", "border-gray-200");
+                }
+
+                preview.appendChild(elem);
+            };
+            reader.onerror = () => {
+                alert("Error reading file. Please try again.");
+                document.getElementById('downloadFile').style.display = 'none';
+                document.getElementById('previewContainer').style.display = 'none';
+
+            }
+            reader.readAsArrayBuffer(wavFile);
+        };
+
+        // ===================================================================
+        // Dark mode
+        // ===================================================================
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDark) {
+            document.body.classList.add('dark');
+        }
+    </script>
+</body>
+</html>
