@@ -12,6 +12,7 @@
       --tile-bg-3: #da532c;
       --tile-bg-4: #ffc40d;
       --tile-bg-5: #7e3878;
+      --tile-bg-6: #e671b8; /* Warna baru untuk Steganografi Wav */
       --tile-hover-opacity: 0.8;
       --text-color: #fff;
       --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -67,6 +68,7 @@
     .tile-3 { background: var(--tile-bg-3); }
     .tile-4 { background: var(--tile-bg-4); }
     .tile-5 { background: var(--tile-bg-5); }
+    .tile-6 { background: var(--tile-bg-6); } /* Styling untuk tile 6 */
 
     /* Ikon sederhana (bisa diganti dengan <img> atau icon font) */
     .metro-tile::before {
@@ -103,6 +105,10 @@
     </div>
     <div class="metro-tile tile-5" data-icon="🧬" onclick="window.location.href='Steganografi.html'">
       Steganografi
+    </div>
+    <!-- Tambahan tombol Steganografi ke WAV -->
+    <div class="metro-tile tile-6" data-icon="🎵" onclick="window.location.href='SteganografiWav.html'">
+      Steganografi Wav
     </div>
   </div>
 
