@@ -12,9 +12,9 @@
       --tile-bg-3: #da532c;
       --tile-bg-4: #ffc40d;
       --tile-bg-5: #7e3878;
-      --tile-bg-6: #e671b8; /* Warna baru untuk Steganografi Wav */
-      --tile-hover-opacity: 0.8;
-      --text-color: #fff;
+      --tile-bg-6: #e671b8;
+      --tile-hover-opacity: 0.85;
+      --text-color: #ffffff;
       --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
@@ -32,34 +32,39 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      padding: 16px;
     }
 
-    /* Container grid 3 kolom */
+    /* Container responsive */
     .metro-container {
       display: grid;
-      grid-template-columns: repeat(3, 150px);
-      grid-auto-rows: 150px;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
       gap: 16px;
+      width: 100%;
+      max-width: 800px;
     }
 
     /* Gaya dasar tiap tile */
     .metro-tile {
       position: relative;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      padding: 16px;
+      font-size: 1rem;
       text-transform: uppercase;
       text-align: center;
       color: var(--text-color);
       cursor: pointer;
       overflow: hidden;
-      border-radius: 4px;
-      transition: opacity 0.2s, transform 0.2s;
+      border-radius: 8px;
+      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
     }
     .metro-tile:hover {
       opacity: var(--tile-hover-opacity);
       transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
 
     /* Warna masing-masing tile */
@@ -68,47 +73,48 @@
     .tile-3 { background: var(--tile-bg-3); }
     .tile-4 { background: var(--tile-bg-4); }
     .tile-5 { background: var(--tile-bg-5); }
-    .tile-6 { background: var(--tile-bg-6); } /* Styling untuk tile 6 */
+    .tile-6 { background: var(--tile-bg-6); }
 
-    /* Ikon sederhana (bisa diganti dengan <img> atau icon font) */
-    .metro-tile::before {
-      content: attr(data-icon);
-      font-size: 2.5rem;
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      opacity: 0.3;
+    /* Ikon sederhana */
+    .metro-tile .icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      opacity: 0.7;
     }
 
-    /* Responsive */
-    @media (max-width: 500px) {
-      .metro-container {
-        grid-template-columns: 1fr;
-      }
+    /* Judul tile */
+    .metro-tile .label {
+      font-size: 0.9rem;
+      line-height: 1.2;
     }
   </style>
 </head>
 <body>
 
   <div class="metro-container">
-    <div class="metro-tile tile-1" data-icon="🏃" onclick="window.location.href='htmlrun.html'">
-      html run
+    <div class="metro-tile tile-1" onclick="location.href='htmlrun.html'">
+      <div class="icon">🏃</div>
+      <div class="label">HTML Run</div>
     </div>
-    <div class="metro-tile tile-2" data-icon="📂" onclick="window.location.href='data.html'">
-      Files
+    <div class="metro-tile tile-2" onclick="location.href='data.html'">
+      <div class="icon">📂</div>
+      <div class="label">Files</div>
     </div>
-    <div class="metro-tile tile-3" data-icon="🔒" onclick="window.location.href='enkripsi.html'">
-      Enkripsi File
+    <div class="metro-tile tile-3" onclick="location.href='enkripsi.html'">
+      <div class="icon">🔒</div>
+      <div class="label">Enkripsi File</div>
     </div>
-    <div class="metro-tile tile-4" data-icon="🖼️" onclick="window.location.href='TingkatkanGambar.html'">
-      Tingkatkan Gambar
+    <div class="metro-tile tile-4" onclick="location.href='TingkatkanGambar.html'">
+      <div class="icon">🖼️</div>
+      <div class="label">Tingkatkan Gambar</div>
     </div>
-    <div class="metro-tile tile-5" data-icon="🧬" onclick="window.location.href='Steganografi.html'">
-      Steganografi
+    <div class="metro-tile tile-5" onclick="location.href='Steganografi.html'">
+      <div class="icon">🧬</div>
+      <div class="label">Steganografi</div>
     </div>
-    <!-- Tambahan tombol Steganografi ke WAV -->
-    <div class="metro-tile tile-6" data-icon="🎵" onclick="window.location.href='SteganografiWav.html'">
-      Steganografi Wav
+    <div class="metro-tile tile-6" onclick="location.href='SteganografiWav.html'">
+      <div class="icon">🎵</div>
+      <div class="label">Steganografi WAV</div>
     </div>
   </div>
 
