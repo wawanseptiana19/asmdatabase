@@ -1,705 +1,688 @@
 <!DOCTYPE html>
-
 <html lang="id">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Advanced HTML Runner - Super Canggih</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-darker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/eclipse.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 20px;
+        }
+        .CodeMirror {
+            height: 300px;
+        }
+        .nav-tabs .nav-link {
+            font-weight: bold;
+        }
+        #preview {
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            width: 100%;
+            height: 400px;
+            background-color: white; /* Set background color for the preview iframe */
+        }
+        #console {
+            background-color: #1e1e1e;
+            color: #f1f1f1;
+            padding: 10px;
+            height: 150px;
+            overflow-y: auto;
+            border-radius: 0.25rem;
+            font-family: monospace;
+            margin-bottom: 10px;
+        }
+        #consoleInput {
+            margin-top: 5px;
+        }
+        /* Styling untuk loading indicator */
+        #loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            font-size: 20px;
+            z-index: 1000;
+        }
+        /* Gaya untuk kontainer Monaco Editor */
+        #monacoContainer {
+            height: 300px;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            margin-bottom: 10px;
+        }
+        .editor-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
 
-  <meta charset="UTF-8">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>Advanced HTML Runner - Super Canggih</title>
-
-  <!-- Bootstrap CSS -->
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- CodeMirror CSS -->
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-
-  <!-- Tema CodeMirror Default -->
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-darker.min.css">
-
-  <!-- Tema tambahan -->
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/eclipse.min.css">
-
-  <style>
-
-    body {
-
-      background-color: #f8f9fa;
-
-      padding-top: 20px;
-
-    }
-
-    .CodeMirror {
-
-      height: 300px;
-
-    }
-
-    .nav-tabs .nav-link {
-
-      font-weight: bold;
-
-    }
-
-    #preview {
-
-      border: 1px solid #ced4da;
-
-      border-radius: 0.25rem;
-
-      width: 100%;
-
-      height: 400px;
-
-    }
-
-    #console {
-
-      background-color: #1e1e1e;
-
-      color: #f1f1f1;
-
-      padding: 10px;
-
-      height: 150px;
-
-      overflow-y: auto;
-
-      border-radius: 0.25rem;
-
-      font-family: monospace;
-
-    }
-
-    #consoleInput {
-
-      margin-top: 5px;
-
-    }
-
-  </style>
-
+        .CodeMirror-scroll-wrap {
+            flex-grow: 1;
+            overflow: auto;
+        }
+    </style>
 </head>
-
 <body>
-
-  <div class="container">
-
-    <!-- Header -->
-
-    <div class="mb-4 text-center">
-
-      <h1>Advanced HTML Runner - Super Canggih</h1>
-
-      <p>Editor dengan preview real-time, autosave, ekspor/impor project, pilihan tema, dan error console.</p>
-
-    </div>
-
-
-
-    <!-- Editor Tab -->
-
-    <ul class="nav nav-tabs" id="editorTab" role="tablist">
-
-      <li class="nav-item" role="presentation">
-
-        <button class="nav-link active" id="html-tab" data-bs-toggle="tab" data-bs-target="#html" type="button" role="tab" aria-controls="html" aria-selected="true">HTML</button>
-
-      </li>
-
-      <li class="nav-item" role="presentation">
-
-        <button class="nav-link" id="css-tab" data-bs-toggle="tab" data-bs-target="#css" type="button" role="tab" aria-controls="css" aria-selected="false">CSS</button>
-
-      </li>
-
-      <li class="nav-item" role="presentation">
-
-        <button class="nav-link" id="js-tab" data-bs-toggle="tab" data-bs-target="#js" type="button" role="tab" aria-controls="js" aria-selected="false">JavaScript</button>
-
-      </li>
-
-    </ul>
-
-    <div class="tab-content" id="editorTabContent">
-
-      <div class="tab-pane fade show active" id="html" role="tabpanel" aria-labelledby="html-tab">
-
-        <textarea id="htmlEditor"></textarea>
-
-      </div>
-
-      <div class="tab-pane fade" id="css" role="tabpanel" aria-labelledby="css-tab">
-
-        <textarea id="cssEditor"></textarea>
-
-      </div>
-
-      <div class="tab-pane fade" id="js" role="tabpanel" aria-labelledby="js-tab">
-
-        <textarea id="jsEditor"></textarea>
-
-      </div>
-
-    </div>
-
-
-
-    <!-- Tombol Aksi -->
-
-    <div class="mt-3 d-flex flex-wrap gap-2">
-
-      <button class="btn btn-primary flex-fill" onclick="runCode()">Jalankan Kode</button>
-
-      <button class="btn btn-success flex-fill" onclick="downloadCode()">Download Kode</button>
-
-      <button class="btn btn-info flex-fill" onclick="toggleFullScreen()">Full Screen Preview</button>
-
-      <button class="btn btn-warning flex-fill" onclick="resetCode()">Reset Editor</button>
-
-      <button class="btn btn-secondary flex-fill" onclick="clearAutosave()">Hapus Autosave</button>
-
-      <button class="btn btn-dark flex-fill" onclick="exportProject()">Ekspor Project</button>
-
-      <button class="btn btn-secondary flex-fill">
-
-        <label class="mb-0">Impor Project: 
-
-          <input type="file" id="importFile" accept=".json" onchange="importProject(event)" style="display:none;">
-
-          <span class="btn btn-sm btn-outline-light" onclick="document.getElementById('importFile').click()">Pilih File</span>
-
-        </label>
-
-      </button>
-
-      <div class="flex-fill">
-
-        <select id="themeSelector" class="form-select" onchange="changeTheme(this.value)">
-
-          <option value="material-darker">Material Darker</option>
-
-          <option value="eclipse">Eclipse</option>
-
-        </select>
-
-      </div>
-
-    </div>
-
-
-
-    <!-- Preview dan Console -->
-
-    <div class="mt-4 row">
-
-      <div class="col-md-8">
-
-        <h4>Preview</h4>
-
-        <iframe id="preview" title="Preview Output"></iframe>
-
-        <!-- Tombol Buka di Tab Baru -->
-
-        <button class="btn btn-primary mt-2" onclick="openInNewTab()">Buka di tab baru</button>
-
-      </div>
-
-      <div class="col-md-4">
-
-        <h4>Console</h4>
-
-        <div id="console"></div>
-
-        <!-- Input untuk mengetik perintah di console -->
-
-        <input type="text" id="consoleInput" class="form-control" placeholder="Ketik perintah di sini...">
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-
-  <!-- Bootstrap JS & Dependencies -->
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- CodeMirror JS -->
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-
-  <!-- Mode HTML -->
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
-
-  <!-- Mode CSS -->
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
-
-  <!-- Mode JavaScript -->
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
-
-  
-
-  <script>
-
-    // Inisialisasi CodeMirror dengan tema default dari selector
-
-    var htmlEditor = CodeMirror.fromTextArea(document.getElementById("htmlEditor"), {
-
-      mode: "text/html",
-
-      theme: "material-darker",
-
-      lineNumbers: true,
-
-      autoCloseTags: true
-
-    });
-
-    var cssEditor = CodeMirror.fromTextArea(document.getElementById("cssEditor"), {
-
-      mode: "css",
-
-      theme: "material-darker",
-
-      lineNumbers: true,
-
-      autoCloseBrackets: true
-
-    });
-
-    var jsEditor = CodeMirror.fromTextArea(document.getElementById("jsEditor"), {
-
-      mode: "javascript",
-
-      theme: "material-darker",
-
-      lineNumbers: true,
-
-      autoCloseBrackets: true
-
-    });
-
-    
-
-    // Fungsi debounce untuk auto-run
-
-    function debounce(func, delay) {
-
-      let timer;
-
-      return function() {
-
-        clearTimeout(timer);
-
-        timer = setTimeout(() => func.apply(this, arguments), delay);
-
-      }
-
-    }
-
-    
-
-    // Menampilkan pesan di console panel
-
-    function logConsole(message) {
-
-      const consoleDiv = document.getElementById("console");
-
-      const p = document.createElement("p");
-
-      p.textContent = message;
-
-      consoleDiv.appendChild(p);
-
-      consoleDiv.scrollTop = consoleDiv.scrollHeight;
-
-    }
-
-    
-
-    // Fungsi untuk menjalankan kode pada iframe preview dan menyertakan error handling
-
-    function runCode() {
-
-      var htmlContent = htmlEditor.getValue();
-
-      var cssContent = "<style>" + cssEditor.getValue() + "</style>";
-
-      var jsContent = "<script>" +
-
-        // Menangkap error dan mengirimkan pesan ke parent
-
-        "window.onerror = function(msg, url, line, col, error) {" +
-
-          "parent.postMessage({type: 'console', message: msg + ' (line: ' + line + ')' }, '*');" +
-
-        "};" +
-
-        jsEditor.getValue() +
-
-      "<\/script>";
-
-      
-
-      var combinedCode = htmlContent + cssContent + jsContent;
-
-      document.getElementById("preview").srcdoc = combinedCode;
-
-      autosaveCode();
-
-      // Bersihkan console setiap kali run
-
-      document.getElementById("console").innerHTML = "";
-
-    }
-
-    
-
-    // Auto-run saat pengguna mengetik (debounced)
-
-    var debouncedRun = debounce(runCode, 500);
-
-    htmlEditor.on("change", debouncedRun);
-
-    cssEditor.on("change", debouncedRun);
-
-    jsEditor.on("change", debouncedRun);
-
-    
-
-    // Fungsi untuk mengunduh kode sebagai file HTML
-
-    function downloadCode() {
-
-      var htmlContent = htmlEditor.getValue();
-
-      var cssContent = "<style>" + cssEditor.getValue() + "</style>";
-
-      var jsContent = "<script>" + jsEditor.getValue() + "<\/script>";
-
-      var combinedCode = htmlContent + "\n" + cssContent + "\n" + jsContent;
-
-      var blob = new Blob([combinedCode], { type: 'text/html' });
-
-      var a = document.createElement('a');
-
-      a.href = URL.createObjectURL(blob);
-
-      a.download = 'kode.html';
-
-      document.body.appendChild(a);
-
-      a.click();
-
-      document.body.removeChild(a);
-
-    }
-
-    
-
-    // Fungsi untuk toggle full screen preview menggunakan Fullscreen API
-
-    function toggleFullScreen() {
-
-      var previewElement = document.getElementById("preview");
-
-      if (!document.fullscreenElement) {
-
-        previewElement.requestFullscreen().catch(err => {
-
-          alert("Error, tidak dapat masuk full screen: " + err.message);
-
-        });
-
-      } else {
-
-        document.exitFullscreen();
-
-      }
-
-    }
-
-    
-
-    // Fungsi untuk mereset editor dan preview
-
-    function resetCode() {
-
-      if(confirm("Apakah Anda yakin ingin mereset editor? Kode yang ada akan dihapus.")) {
-
-        htmlEditor.setValue("");
-
-        cssEditor.setValue("");
-
-        jsEditor.setValue("");
-
-        document.getElementById("preview").srcdoc = "";
-
-        document.getElementById("console").innerHTML = "";
-
-        autosaveCode(); // update localStorage
-
-      }
-
-    }
-
-    
-
-    // Autosave menggunakan localStorage
-
-    function autosaveCode() {
-
-      const codeData = {
-
-        html: htmlEditor.getValue(),
-
-        css: cssEditor.getValue(),
-
-        js: jsEditor.getValue()
-
-      };
-
-      localStorage.setItem("advancedHtmlRunnerCode", JSON.stringify(codeData));
-
-    }
-
-    
-
-    // Memuat kode dari localStorage
-
-    function loadAutosave() {
-
-      const saved = localStorage.getItem("advancedHtmlRunnerCode");
-
-      if (saved) {
-
-        try {
-
-          const codeData = JSON.parse(saved);
-
-          htmlEditor.setValue(codeData.html || "");
-
-          cssEditor.setValue(codeData.css || "");
-
-          jsEditor.setValue(codeData.js || "");
-
-          runCode();
-
-        } catch(e) {
-
-          console.error("Gagal memuat autosave:", e);
-
-        }
-
-      }
-
-    }
-
-    
-
-    // Hapus data autosave
-
-    function clearAutosave() {
-
-      if(confirm("Hapus data autosave?")) {
-
-        localStorage.removeItem("advancedHtmlRunnerCode");
-
-        alert("Autosave telah dihapus.");
-
-      }
-
-    }
-
-    
-
-    // Ekspor project sebagai file JSON
-
-    function exportProject() {
-
-      const projectData = {
-
-        html: htmlEditor.getValue(),
-
-        css: cssEditor.getValue(),
-
-        js: jsEditor.getValue()
-
-      };
-
-      const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
-
-      const a = document.createElement('a');
-
-      a.href = URL.createObjectURL(blob);
-
-      a.download = 'project.json';
-
-      document.body.appendChild(a);
-
-      a.click();
-
-      document.body.removeChild(a);
-
-    }
-
-    
-
-    // Impor project dari file JSON
-
-    function importProject(event) {
-
-      const file = event.target.files[0];
-
-      if (!file) return;
-
-      const reader = new FileReader();
-
-      reader.onload = function(e) {
-
-        try {
-
-          const projectData = JSON.parse(e.target.result);
-
-          htmlEditor.setValue(projectData.html || "");
-
-          cssEditor.setValue(projectData.css || "");
-
-          jsEditor.setValue(projectData.js || "");
-
-          runCode();
-
-          autosaveCode();
-
-          alert("Project berhasil dimuat!");
-
-        } catch (err) {
-
-          alert("Gagal memuat project: " + err);
-
-        }
-
-      }
-
-      reader.readAsText(file);
-
-    }
-
-    
-
-    // Ubah tema CodeMirror
-
-    function changeTheme(theme) {
-
-      htmlEditor.setOption("theme", theme);
-
-      cssEditor.setOption("theme", theme);
-
-      jsEditor.setOption("theme", theme);
-
-    }
-
-    
-
-    // Fungsi untuk memuat file tools dari URL ke editor HTML
-
-    function loadTools() {
-
-      const url = "https://raw.githubusercontent.com/wawanseptiana19/Tools/refs/heads/main/Menyembunyikan%20dan%20Memunculkan%20File%20Media%20Video%2C%20Audio%2C%20Gambar.txt";
-
-      fetch(url)
-
-        .then(response => {
-
-          if (!response.ok) throw new Error("Gagal mengambil file.");
-
-          return response.text();
-
-        })
-
-        .then(text => {
-
-          htmlEditor.setValue(text);
-
-          runCode();
-
-          logConsole("Kode tools berhasil dimuat ke editor HTML.");
-
-        })
-
-        .catch(err => {
-
-          logConsole("Error: " + err.message);
-
-        });
-
-    }
-
-    
-
-    // Mendeteksi perintah di input console
-
-    document.getElementById("consoleInput").addEventListener("keydown", function(e) {
-
-      if (e.key === "Enter") {
-
-        const command = e.target.value.trim();
-
-        if (command === "--e1") {
-
-          logConsole("Perintah '--e1' terdeteksi. Memuat tools...");
-
-          loadTools(); // Langsung panggil fungsi loadTools tanpa menampilkan tombol
-
-        } else {
-
-          logConsole("Perintah tidak dikenal: " + command);
-
-        }
-
-        e.target.value = "";
-
-      }
-
-    });
-
-    
-
-    // Fungsi untuk membuka preview di tab baru
-
-    function openInNewTab() {
-
-      var content = document.getElementById("preview").srcdoc;
-
-      var newTab = window.open();
-
-      newTab.document.write(content);
-
-      newTab.document.close();
-
-    }
-
-    
-
-    // Muat autosave saat halaman dimuat
-
-    window.addEventListener("load", loadAutosave);
-
-  </script>
-
+    <div class="container">
+        <div class="mb-4 text-center">
+            <h1>Advanced HTML Runner - Super Canggih</h1>
+            <p>Editor dengan preview real-time, kolaborasi langsung, framework CSS, dan banyak lagi!</p>
+        </div>
+
+        <ul class="nav nav-tabs" id="editorTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="html-tab" data-bs-toggle="tab" data-bs-target="#html" type="button" role="tab" aria-controls="html" aria-selected="true">HTML</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="css-tab" data-bs-toggle="tab" data-bs-target="#css" type="button" role="tab" aria-controls="css" aria-selected="false">CSS</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="js-tab" data-bs-toggle="tab" data-bs-target="#js" type="button" role="tab" aria-controls="js" aria-selected="false">JavaScript</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">Settings</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="editorTabContent">
+            <div class="tab-pane fade show active" id="html" role="tabpanel" aria-labelledby="html-tab">
+                <div class="editor-container">
+                    <textarea id="htmlEditor"></textarea>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="css" role="tabpanel" aria-labelledby="css-tab">
+                <div class="editor-container">
+                    <textarea id="cssEditor"></textarea>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="js" role="tabpanel" aria-labelledby="js-tab">
+                <div class="editor-container">
+                    <textarea id="jsEditor"></textarea>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                <div class="mt-3">
+                    <h4>Tema Editor</h4>
+                    <select id="themeSelector" class="form-select mb-3" onchange="changeTheme(this.value)">
+                        <option value="material-darker">Material Darker</option>
+                        <option value="eclipse">Eclipse</option>
+                        <option value="monokai">Monokai</option>
+                        <option value="vibrant-ink">Vibrant Ink</option>
+                    </select>
+                    <h4>Font Size</h4>
+                    <input type="number" id="fontSizeInput" class="form-control mb-3" value="16" min="10" max="30" onchange="changeFontSize(this.value)">
+                    <h4>Framework CSS</h4>
+                    <select id="frameworkSelector" class="form-select mb-3" onchange="changeFramework(this.value)">
+                        <option value="none">None</option>
+                        <option value="bootstrap">Bootstrap</option>
+                        <option value="tailwind">Tailwind CSS</option>
+                        <option value="bulma">Bulma</option>
+                    </select>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="enableLiveCollaboration" onchange="toggleLiveCollaboration(this.checked)">
+                        <label class="form-check-label" for="enableLiveCollaboration">
+                            Enable Live Collaboration (Experimental)
+                        </label>
+                    </div>
+                    <p class="text-muted">Fitur Kolaborasi Langsung memerlukan Pusher account dan App ID.</p>
+                    <div id="collaborationSettings" style="display: none;">
+                        <div class="mb-3">
+                            <label for="pusherAppId" class="form-label">Pusher App ID</label>
+                            <input type="text" class="form-control" id="pusherAppId" placeholder="Masukkan App ID Anda">
+                        </div>
+                        <div class="mb-3">
+                            <label for="pusherKey" class="form-label">Pusher Key</label>
+                            <input type="text" class="form-control" id="pusherKey" placeholder="Masukkan Key Anda">
+                        </div>
+                        <div class="mb-3">
+                            <label for="pusherCluster" class="form-label">Pusher Cluster</label>
+                            <input type="text" class="form-control" id="pusherCluster" placeholder="Masukkan Cluster Anda">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex flex-wrap gap-2">
+            <button class="btn btn-primary flex-fill" onclick="runCode()">Jalankan Kode</button>
+            <button class="btn btn-success flex-fill" onclick="downloadCode()">Download Kode</button>
+            <button class="btn btn-info flex-fill" onclick="toggleFullScreen()">Full Screen Preview</button>
+            <button class="btn btn-warning flex-fill" onclick="resetCode()">Reset Editor</button>
+            <button class="btn btn-secondary flex-fill" onclick="clearAutosave()">Hapus Autosave</button>
+            <button class="btn btn-dark flex-fill" onclick="exportProject()">Ekspor Project</button>
+            <button class="btn btn-secondary flex-fill">
+                <label class="mb-0">Impor Project:
+                    <input type="file" id="importFile" accept=".json" onchange="importProject(event)" style="display:none;">
+                    <span class="btn btn-sm btn-outline-light" onclick="document.getElementById('importFile').click()">Pilih File</span>
+                </label>
+            </button>
+            <button id="loadToolsButton" class="btn btn-danger flex-fill" onclick="loadTools()">Load Tools</button>
+        </div>
+
+        <div class="mt-4 row">
+            <div class="col-md-8">
+                <h4>Preview</h4>
+                <iframe id="preview" title="Preview Output"></iframe>
+                <button class="btn btn-primary mt-2" onclick="openInNewTab()">Buka di tab baru</button>
+            </div>
+            <div class="col-md-4">
+                <h4>Console</h4>
+                <div id="console"></div>
+                <input type="text" id="consoleInput" class="form-control" placeholder="Ketik perintah di sini...">
+            </div>
+        </div>
+    </div>
+
+    <div id="loading">Loading...</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.js"></script>
+    <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Inisialisasi CodeMirror dengan tema default dari selector
+        var htmlEditor = CodeMirror.fromTextArea(document.getElementById("htmlEditor"), {
+            mode: "htmlmixed",
+            theme: "material-darker",
+            lineNumbers: true,
+            autoCloseTags: true,
+            indentUnit: 2,
+            tabSize: 2
+        });
+        var cssEditor = CodeMirror.fromTextArea(document.getElementById("cssEditor"), {
+            mode: "css",
+            theme: "material-darker",
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            indentUnit: 2,
+            tabSize: 2
+        });
+        var jsEditor = CodeMirror.fromTextArea(document.getElementById("jsEditor"), {
+            mode: "javascript",
+            theme: "material-darker",
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            indentUnit: 2,
+            tabSize: 2
+        });
+
+        // Fungsi debounce untuk auto-run
+        function debounce(func, delay) {
+            let timer;
+            return function() {
+                clearTimeout(timer);
+                timer = setTimeout(() => func.apply(this, arguments), delay);
+            }
+        }
+
+        // Menampilkan pesan di console panel
+        function logConsole(message, type = 'info') {
+            const consoleDiv = document.getElementById("console");
+            const p = document.createElement("p");
+            p.textContent = message;
+            switch (type) {
+                case 'error':
+                    p.style.color = '#ff4444';
+                    break;
+                case 'warning':
+                    p.style.color = '#ffbb33';
+                    break;
+                case 'info':
+                default:
+                    p.style.color = '#f1f1f1';
+            }
+            consoleDiv.appendChild(p);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        // Fungsi untuk menjalankan kode pada iframe preview dan menyertakan error handling
+        function runCode() {
+            showLoading();
+            var htmlContent = htmlEditor.getValue();
+            var cssContent = "<style>" + cssEditor.getValue() + "</style>";
+            var jsContent = "<script>" +
+                // Menangkap error dan mengirimkan pesan ke parent
+                "window.onerror = function(msg, url, line, col, error) {" +
+                "  parent.postMessage({type: 'console', message: '[ERROR] ' + msg + ' (line: ' + line + ')' }, '*');" +
+                "  return true;" + // Prevent error from showing in browser console
+                "};" +
+                jsEditor.getValue() +
+                "<\/script>";
+
+            var combinedCode = htmlContent + cssContent + jsContent;
+            document.getElementById("preview").srcdoc = combinedCode;
+            autosaveCode();
+            // Bersihkan console setiap kali run
+            document.getElementById("console").innerHTML = "";
+            setTimeout(hideLoading, 300); // Simulate network delay
+        }
+
+        // Auto-run saat pengguna mengetik (debounced)
+        var debouncedRun = debounce(runCode, 500);
+        htmlEditor.on("change", debouncedRun);
+        cssEditor.on("change", debouncedRun);
+        jsEditor.on("change", debouncedRun);
+
+        // Fungsi untuk mengunduh kode sebagai file HTML
+        function downloadCode() {
+            var htmlContent = htmlEditor.getValue();
+            var cssContent = "<style>" + cssEditor.getValue() + "</style>";
+            var jsContent = "<script>" + jsEditor.getValue() + "<\/script>";
+            var combinedCode = htmlContent + "\n" + cssContent + "\n" + jsContent;
+            var blob = new Blob([combinedCode], { type: 'text/html' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'kode.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('Kode berhasil diunduh!', 'success');
+        }
+
+        // Fungsi untuk toggle full screen preview menggunakan Fullscreen API
+        function toggleFullScreen() {
+            var previewElement = document.getElementById("preview");
+            if (!document.fullscreenElement) {
+                previewElement.requestFullscreen().catch(err => {
+                    alert("Error, tidak dapat masuk full screen: " + err.message);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Fungsi untuk mereset editor dan preview
+        function resetCode() {
+            Swal.fire({
+                title: 'Reset Editor?',
+                text: "Apakah Anda yakin ingin mereset editor? Kode yang ada akan dihapus.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Reset!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    htmlEditor.setValue("");
+                    cssEditor.setValue("");
+                    jsEditor.setValue("");
+                    document.getElementById("preview").srcdoc = "";
+                    document.getElementById("console").innerHTML = "";
+                    autosaveCode(); // update localStorage
+                    Swal.fire(
+                        'Berhasil!',
+                        'Editor telah direset.',
+                        'success'
+                    );
+                }
+            });
+        }
+
+        // Autosave menggunakan localStorage
+        function autosaveCode() {
+            const codeData = {
+                html: htmlEditor.getValue(),
+                css: cssEditor.getValue(),
+                js: jsEditor.getValue()
+            };
+            localStorage.setItem("advancedHtmlRunnerCode", JSON.stringify(codeData));
+        }
+
+        // Memuat kode dari localStorage
+        function loadAutosave() {
+            const saved = localStorage.getItem("advancedHtmlRunnerCode");
+            if (saved) {
+                try {
+                    const codeData = JSON.parse(saved);
+                    htmlEditor.setValue(codeData.html || "");
+                    cssEditor.setValue(codeData.css || "");
+                    jsEditor.setValue(codeData.js || "");
+                    runCode();
+                } catch(e) {
+                    console.error("Gagal memuat autosave:", e);
+                    logConsole("Gagal memuat autosave. LocalStorage mungkin rusak.", 'error');
+                }
+            }
+        }
+
+        // Hapus data autosave
+        function clearAutosave() {
+            Swal.fire({
+                title: 'Hapus Autosave?',
+                text: "Apakah Anda yakin ingin menghapus data autosave?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem("advancedHtmlRunnerCode");
+                    Swal.fire(
+                        'Berhasil!',
+                        'Autosave telah dihapus.',
+                        'success'
+                    );
+                }
+            });
+        }
+
+        // Ekspor project sebagai file JSON
+        function exportProject() {
+            const projectData = {
+                html: htmlEditor.getValue(),
+                css: cssEditor.getValue(),
+                js: jsEditor.getValue()
+            };
+            const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'project.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('Project berhasil diekspor!', 'success');
+        }
+
+        // Impor project dari file JSON
+        function importProject(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const projectData = JSON.parse(e.target.result);
+                    htmlEditor.setValue(projectData.html || "");
+                    cssEditor.setValue(projectData.css || "");
+                    jsEditor.setValue(projectData.js || "");
+                    runCode();
+                    autosaveCode();
+                    showToast('Project berhasil diimpor!', 'success');
+                } catch (err) {
+                    Swal.fire({
+                        title: 'Gagal Impor Project!',
+                        text: 'Terjadi kesalahan saat memproses file: ' + err,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    logConsole("Gagal memuat project: " + err, 'error');
+                }
+            }
+            reader.readAsText(file);
+        }
+
+        // Ubah tema CodeMirror
+        function changeTheme(theme) {
+            htmlEditor.setOption("theme", theme);
+            cssEditor.setOption("theme", theme);
+            jsEditor.setOption("theme", theme);
+            localStorage.setItem('editorTheme', theme);
+        }
+
+        // Ubah ukuran font editor
+        function changeFontSize(size) {
+            htmlEditor.getWrapperElement().style.fontSize = size + 'px';
+            cssEditor.getWrapperElement().style.fontSize = size + 'px';
+            jsEditor.getWrapperElement().style.fontSize = size + 'px';
+            localStorage.setItem('editorFontSize', size);
+        }
+
+        // Fungsi untuk menampilkan toast notification
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                close: true,
+                gravity: "bottom", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                backgroundColor: type === 'success' ? "#4caf50" : "#f44336",
+                style: {
+                    borderRadius: "5px"
+                }
+            }).showToast();
+        }
+
+        // Fungsi untuk menampilkan loading indicator
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        // Fungsi untuk menyembunyikan loading indicator
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Menyimpan preferensi framework CSS
+        function changeFramework(framework) {
+            localStorage.setItem('cssFramework', framework);
+            // Tambahkan logika untuk memuat CSS framework jika diperlukan
+            if (framework === 'bootstrap') {
+                // Jika menggunakan CDN, pastikan sudah ada di HTML, ini hanya contoh.
+                // Jika menggunakan module bundler, import CSS di sini.
+                logConsole('Bootstrap dipilih. Pastikan sudah ditambahkan ke HTML.', 'info');
+            } else if (framework === 'tailwind') {
+                 logConsole('Tailwind CSS dipilih. Pastikan sudah ditambahkan ke HTML.', 'info');
+            } else if (framework === 'bulma') {
+                logConsole('Bulma CSS dipilih. Pastikan sudah ditambahkan ke HTML.', 'info');
+            }
+        }
+
+        // Menerapkan framework yang dipilih saat load
+        function applyFrameworkPreference() {
+            const savedFramework = localStorage.getItem('cssFramework');
+            if (savedFramework) {
+                document.getElementById('frameworkSelector').value = savedFramework;
+                changeFramework(savedFramework); // Terapkan framework
+            }
+        }
+
+        // Menerapkan tema yang dipilih saat load
+        function applyThemePreference() {
+            const savedTheme = localStorage.getItem('editorTheme');
+            if (savedTheme) {
+                document.getElementById('themeSelector').value = savedTheme;
+                changeTheme(savedTheme);
+            }
+        }
+
+        // Menerapkan ukuran font yang dipilih saat load
+        function applyFontSizePreference() {
+            const savedFontSize = localStorage.getItem('editorFontSize');
+            if (savedFontSize) {
+                document.getElementById('fontSizeInput').value = savedFontSize;
+                changeFontSize(savedFontSize);
+            }
+        }
+
+        // Fungsi untuk inisialisasi Pusher
+        let pusher = null;
+        let channel = null;
+        function initPusher(appId, key, cluster) {
+            if (!appId || !key || !cluster) {
+                logConsole("Pusher App ID, Key, dan Cluster harus diisi untuk mengaktifkan kolaborasi.", "warning");
+                return;
+            }
+
+            Pusher.logToConsole = true;
+            pusher = new Pusher(key, {
+                appId: appId,
+                cluster: cluster,
+                useTLS: true
+            });
+
+            channel = pusher.subscribe('my-channel');
+            channel.bind('code-update', function(data) {
+                if (data.senderId !== localStorage.getItem('clientId')) {
+                    if (data.html) htmlEditor.setValue(data.html);
+                    if (data.css) cssEditor.setValue(data.css);
+                    if (data.js) jsEditor.setValue(data.js);
+                    logConsole('Menerima update kode dari kolaborator lain.', 'info');
+                }
+            });
+
+            // Kirim update kode saat ada perubahan
+            htmlEditor.on('change', () => sendCodeUpdate('html'));
+            cssEditor.on('change', () => sendCodeUpdate('css'));
+            jsEditor.on('change', () => sendCodeUpdate('js'));
+
+            logConsole('Kolaborasi langsung diaktifkan!', 'success');
+        }
+
+        // Fungsi untuk mengirim update kode
+        function sendCodeUpdate(editorType) {
+            if (!pusher || !channel) return;
+
+            let code = '';
+            switch (editorType) {
+                case 'html':
+                    code = htmlEditor.getValue();
+                    break;
+                case 'css':
+                    code = cssEditor.getValue();
+                    break;
+                case 'js':
+                    code = jsEditor.getValue();
+                    break;
+            }
+
+            const data = {
+                senderId: localStorage.getItem('clientId'),
+                [editorType]: code
+            };
+            channel.trigger('code-update', data);
+        }
+
+        // Fungsi untuk mengaktifkan/nonaktifkan kolaborasi langsung
+        function toggleLiveCollaboration(enabled) {
+            const collaborationSettings = document.getElementById('collaborationSettings');
+            if (enabled) {
+                collaborationSettings.style.display = 'block';
+                const pusherAppId = document.getElementById('pusherAppId').value;
+                const pusherKey = document.getElementById('pusherKey').value;
+                const pusherCluster = document.getElementById('pusherCluster').value;
+
+                if (!pusherAppId || !pusherKey || !pusherCluster) {
+                    Swal.fire({
+                        title: 'Peringatan!',
+                        text: 'Untuk mengaktifkan kolaborasi, Anda harus memasukkan Pusher App ID, Key, dan Cluster di tab Settings.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                    document.getElementById('enableLiveCollaboration').checked = false;
+                    collaborationSettings.style.display = 'none';
+                    return;
+                }
+
+                // Simpan info Pusher
+                localStorage.setItem('pusherAppId', pusherAppId);
+                localStorage.setItem('pusherKey', pusherKey);
+                localStorage.setItem('pusherCluster', pusherCluster);
+                localStorage.setItem('liveCollaboration', 'true');
+
+                // Generate dan simpan client ID
+                if (!localStorage.getItem('clientId')) {
+                    localStorage.setItem('clientId', Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
+                }
+
+                initPusher(pusherAppId, pusherKey, pusherCluster); // Inisialisasi Pusher
+            } else {
+                collaborationSettings.style.display = 'none';
+                localStorage.setItem('liveCollaboration', 'false');
+                if (pusher) {
+                    pusher.disconnect();
+                    pusher = null;
+                    channel = null;
+                    logConsole('Kolaborasi langsung dinonaktifkan.', 'info');
+                }
+            }
+        }
+
+        // Fungsi untuk memuat file tools dari URL ke editor HTML
+        function loadTools() {
+            showLoading();
+            const url = "https://raw.githubusercontent.com/wawanseptiana19/Tools/refs/heads/main/Menyembunyikan%20dan%20Memunculkan%20File%20Media%20Video%2C%20Audio%2C%20Gambar.txt";
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error("Gagal mengambil file.");
+                    return response.text();
+                })
+                .then(text => {
+                    htmlEditor.setValue(text);
+                    runCode();
+                    logConsole("Kode tools berhasil dimuat ke editor HTML.", 'success');
+                })
+                .catch(err => {
+                    logConsole("Error: " + err.message, 'error');
+                    Swal.fire({
+                        title: 'Gagal Memuat Tools',
+                        text: 'Terjadi kesalahan saat memuat tools: ' + err.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                })
+                .finally(hideLoading);
+        }
+
+        // Mendeteksi perintah di input console
+        document.getElementById("consoleInput").addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                const command = e.target.value.trim();
+                if (command === "--e1") {
+                    logConsole("Perintah '--e1' terdeteksi. Memuat tools...", 'info');
+                    loadTools(); // Langsung panggil fungsi loadTools
+                } else {
+                    logConsole("Perintah tidak dikenal: " + command, 'warning');
+                }
+                e.target.value = "";
+            }
+        });
+
+        // Fungsi untuk membuka preview di tab baru
+        function openInNewTab() {
+            var content = document.getElementById("preview").srcdoc;
+            var newTab = window.open();
+            newTab.document.write(content);
+            newTab.document.close();
+        }
+
+        // Muat autosave saat halaman dimuat
+        window.addEventListener("load", () => {
+            loadAutosave();
+            applyThemePreference();
+            applyFontSizePreference();
+            applyFrameworkPreference();
+
+            // Cek live collaboration
+            const liveCollaborationEnabled = localStorage.getItem('liveCollaboration') === 'true';
+            const pusherAppId = localStorage.getItem('pusherAppId');
+            const pusherKey = localStorage.getItem('pusherKey');
+            const pusherCluster = localStorage.getItem('pusherCluster');
+            document.getElementById('enableLiveCollaboration').checked = liveCollaborationEnabled;
+            if (liveCollaborationEnabled && pusherAppId && pusherKey && pusherCluster) {
+                document.getElementById('collaborationSettings').style.display = 'block';
+                document.getElementById('pusherAppId').value = pusherAppId;
+                document.getElementById('pusherKey').value = pusherKey;
+                document.getElementById('pusherCluster').value = pusherCluster;
+                initPusher(pusherAppId, pusherKey, pusherCluster);
+            }
+        });
+    </script>
 </body>
-
 </html>
