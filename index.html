@@ -13,10 +13,11 @@
       --tile-bg-4: #ffc40d;
       --tile-bg-5: #7e3878;
       --tile-bg-6: #e671b8;
-      --tile-bg-7: #00a300; /* Warna untuk Video Frame */
+      --tile-bg-7: #00a300;
       --tile-hover-opacity: 0.85;
       --text-color: #ffffff;
       --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --disabled-opacity: 0.6;
     }
 
     /* Reset dasar */
@@ -75,7 +76,14 @@
     .tile-4 { background: var(--tile-bg-4); }
     .tile-5 { background: var(--tile-bg-5); }
     .tile-6 { background: var(--tile-bg-6); }
-    .tile-7 { background: var(--tile-bg-7); } /* Styling tombol Video Frame */
+    .tile-7 { background: var(--tile-bg-7); }
+
+    /* Style untuk tombol disabled */
+    .disabled {
+      opacity: var(--disabled-opacity);
+      cursor: default;
+      pointer-events: none;
+    }
 
     /* Ikon sederhana */
     .metro-tile .icon {
@@ -98,9 +106,9 @@
       <div class="icon">🏃</div>
       <div class="label">HTML Run</div>
     </div>
-    <div class="metro-tile tile-2" onclick="location.href='data.html'">
+    <div class="metro-tile tile-2 disabled">
       <div class="icon">📂</div>
-      <div class="label">Files</div>
+      <div class="label">Files (Disabled)</div>
     </div>
     <div class="metro-tile tile-3" onclick="location.href='enkripsi.html'">
       <div class="icon">🔒</div>
@@ -118,7 +126,6 @@
       <div class="icon">🎵</div>
       <div class="label">Steganografi WAV</div>
     </div>
-    <!-- Tombol baru untuk Video Frame -->
     <div class="metro-tile tile-7" onclick="location.href='VideoFrame.html'">
       <div class="icon">🎬</div>
       <div class="label">Video Frame</div>
