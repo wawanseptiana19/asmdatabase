@@ -1,417 +1,624 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Enkripsi & Dekripsi File Aman</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .dark-mode {
-      --bg-color: #111827;
-      --text-color: #f9fafb;
-      --primary-color: #8b5cf6;
-      --primary-hover: #a855f7;
-      --secondary-color: #1f2937;
-      --secondary-hover: #374151;
-      --success-color: #14e5b0;
-      --success-hover: #06d6a0;
-      --border-color: #4b5563;
-      --input-bg: #374151;
-      --input-border: #6b7280;
-      --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-    }
-
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      margin: 0;
-      padding: 0;
-      transition: background-color 0.2s, color 0.2s;
-    }
-
-    .tabs {
-      display: flex;
-      justify-content: center;
-      padding: 0.75rem 0;
-      background-color: transparent;
-    }
-
-    .tab-button {
-      flex: 1;
-      padding: 1rem;
-      text-align: center;
-      color: var(--text-color);
-      cursor: pointer;
-      font-weight: 500;
-      border-bottom: 2px solid transparent;
-      transition: color 0.2s, border-color 0.2s, background-color 0.2s;
-      border-radius: 0.375rem 0.375rem 0 0;
-      background-color: var(--secondary-color);
-    }
-
-    .tab-button:hover {
-      color: var(--primary-color);
-      border-bottom-color: var(--primary-color);
-      background-color: var(--secondary-hover);
-    }
-
-    .tab-button.active {
-      color: #fff;
-      border-bottom-color: var(--success-color);
-      background-color: var(--success-color);
-      font-weight: 700;
-    }
-
-    .tab-content {
-      display: none;
-      padding: 1.25rem;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background-color: var(--bg-color);
-      padding: 2rem;
-      border-radius: 0.5rem;
-      margin-top: 1.5rem;
-      box-shadow: var(--box-shadow);
-      border: 1px solid var(--border-color);
-    }
-
-    h2 {
-      margin-bottom: 1rem;
-      font-weight: 700;
-      color: var(--primary-color);
-      text-align: center;
-    }
-
-    label {
-      display: block;
-      margin-top: 0.75rem;
-      margin-bottom: 0.375rem;
-      font-weight: 500;
-      color: var(--text-color);
-    }
-
-    input, select {
-      padding: 0.75rem;
-      width: calc(100% - 2rem);
-      border-radius: 0.375rem;
-      border: 2px solid var(--input-border);
-      background-color: var(--input-bg);
-      color: var(--text-color);
-      margin-bottom: 1rem;
-      transition: border-color 0.2s, background-color 0.2s;
-      box-sizing: border-box;
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-    }
-
-    button {
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.375rem;
-      border: none;
-      background-color: var(--primary-color);
-      color: white;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-      width: 100%;
-      display: block;
-      margin: 1rem auto;
-      text-align: center;
-    }
-
-    button:hover {
-      background-color: var(--primary-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-    }
-
-    button:active {
-      transform: translateY(0);
-      box-shadow: none;
-    }
-
-    .status {
-      margin-top: 1.5rem;
-      font-size: 0.875rem;
-      color: var(--text-color);
-      text-align: center;
-      padding: 0.75rem;
-      background-color: var(--secondary-color);
-      border-radius: 0.375rem;
-      border: 1px solid var(--border-color);
-      word-wrap: break-word;
-      overflow-x: auto;
-      max-width: 100%;
-    }
-
-    a.download-link {
-      display: inline-block;
-      margin-top: 1rem;
-      background-color: var(--success-color);
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.375rem;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background-color 0.2s, transform 0.2s;
-      text-align: center;
-      width: fit-content;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    a.download-link:hover {
-      background-color: var(--success-hover);
-      transform: translateY(-2px);
-    }
-
-    #previewContainer {
-      margin-top: 1.5rem;
-      text-align: center;
-      border: 2px dashed var(--border-color);
-      padding: 1rem;
-      border-radius: 0.375rem;
-      background-color: var(--secondary-color);
-      overflow-x: auto;
-      max-width: 100%;
-    }
-
-    #previewContainer img, #previewContainer video {
-      max-width: 100%;
-      margin-top: 0.75rem;
-      border-radius: 0.375rem;
-      box-shadow: var(--box-shadow);
-    }
-
-    @media (max-width: 640px) {
-      .container {
-        padding: 1rem;
-        margin-top: 1rem;
-      }
-      .tabs {
-        flex-direction: column;
-      }
-      .tab-button {
-        width: 100%;
-        border-bottom: 2px solid transparent;
-        border-radius: 0;
-      }
-      .tab-button:not(.active) {
-        background-color: var(--secondary-hover);
-      }
-      input, select {
-        width: calc(100% - 1.5rem);
-      }
-    }
-  </style>
-</head>
-<body class="bg-gray-100 dark:bg-gray-900">
-
-  <div class="tabs">
-    <div class="tab-button active" data-tab="encryptTab">Enkripsi</div>
-    <div class="tab-button" data-tab="decryptTab">Dekripsi</div>
-  </div>
-
-  <div class="container">
-    <!-- Tab Enkripsi -->
-    <div id="encryptTab" class="tab-content active">
-      <h2>Enkripsi File</h2>
-      <label for="fileInputEnc" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Pilih file:</label>
-      <input type="file" id="fileInputEnc" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 leading-tight focus:outline-none focus:shadow-outline mb-4">
-      <button id="encryptBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Enkripsi</button>
-      <p class="status text-gray-700 dark:text-gray-300 mt-6 py-3 px-4 bg-gray-200 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-700" id="statusEnc"></p>
-      <a id="downloadLink" class="download-link bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4 inline-block" style="display:none;">Download Enkripsi</a>
-    </div>
-
-    <!-- Tab Dekripsi -->
-    <div id="decryptTab" class="tab-content">
-      <h2>Dekripsi File</h2>
-      <!-- Menggunakan layout flex untuk membagi kolom -->
-      <div class="md:flex md:space-x-8">
-        <!-- Kolom kiri: Form input dekripsi -->
-        <div class="md:w-1/2">
-          <label for="fileInputDec" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Pilih file terenkripsi:</label>
-          <input type="file" id="fileInputDec" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 leading-tight focus:outline-none focus:shadow-outline mb-4">
-          <label for="keyInput" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Kunci HEX:</label>
-          <input type="text" id="keyInput" placeholder="Masukkan kunci HEX" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 leading-tight focus:outline-none focus:shadow-outline mb-4">
-          <label for="fileTypeSelect" class="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Pilih ekstensi hasil dekripsi:</label>
-          <select id="fileTypeSelect" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 leading-tight focus:outline-none focus:shadow-outline mb-4">
-            <option value="txt">.txt</option>
-            <option value="png">.png</option>
-            <option value="jpg">.jpg</option>
-            <option value="mp4">.mp4</option>
-            <option value="zip">.zip</option>
-            <option value="rar">.rar</option>
-          </select>
-          <button id="decryptBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Dekripsi</button>
-        </div>
-        <!-- Kolom kanan: Hasil dekripsi -->
-        <div class="md:w-1/2">
-          <p class="status text-gray-700 dark:text-gray-300 mt-6 py-3 px-4 bg-gray-200 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-700" id="statusDec"></p>
-          <a id="downloadLinkDec" class="download-link bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4 inline-block" style="display:none;">Download Dekripsi</a>
-          <div id="previewContainer"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Fungsi untuk menghasilkan nama file acak
-    function generateRandomFileName(length = 24) {
-      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let randomName = '';
-      for (let i = 0; i < length; i++) {
-        randomName += characters.charAt(Math.floor(Math.random() * characters.length));
-      }
-      return randomName;
-    }
-
-    // Aktifkan dark mode berdasarkan waktu (18:00 - 06:00)
-    const jam = new Date().getHours();
-    if (jam >= 18 || jam < 6) document.body.classList.add("dark-mode");
-
-    // Tab switching
-    document.querySelectorAll('.tab-button').forEach(button => {
-      button.addEventListener('click', () => {
-        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        button.classList.add('active');
-        document.getElementById(button.dataset.tab).classList.add('active');
-      });
-    });
-
-    function readFileAsArrayBuffer(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsArrayBuffer(file);
-      });
-    }
-
-    function bufferToHex(buffer) {
-      return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    function hexToBuffer(hex) {
-      return new Uint8Array(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16))).buffer;
-    }
-
-    async function generateKey() {
-      return await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
-    }
-
-    async function encryptFile(file) {
-      const buffer = await readFileAsArrayBuffer(file);
-      const key = await generateKey();
-      const iv = crypto.getRandomValues(new Uint8Array(12));
-      const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, buffer);
-      return { encrypted, iv, key };
-    }
-
-    async function decryptFile(file, keyHex) {
-      const buffer = await readFileAsArrayBuffer(file);
-      const data = new Uint8Array(buffer);
-      const iv = data.slice(0, 12);
-      const content = data.slice(12);
-      const key = await crypto.subtle.importKey("raw", hexToBuffer(keyHex), "AES-GCM", false, ["decrypt"]);
-      return await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, content);
-    }
-
-    // Enkripsi
-    document.getElementById('fileInputEnc').addEventListener('change', () => {
-      document.getElementById('statusEnc').textContent = "";
-      document.getElementById('downloadLink').style.display = "none";
-    });
-
-    document.getElementById('encryptBtn').addEventListener('click', async () => {
-      const fileInput = document.getElementById('fileInputEnc');
-      const status = document.getElementById('statusEnc');
-      const downloadLink = document.getElementById('downloadLink');
-
-      if (!fileInput.files.length) {
-        status.textContent = "Pilih file terlebih dahulu.";
-        return;
-      }
-
-      status.textContent = "Memproses enkripsi...";
-      const file = fileInput.files[0];
-      const { encrypted, iv, key } = await encryptFile(file);
-
-      const combined = new Uint8Array(iv.length + encrypted.byteLength);
-      combined.set(iv);
-      combined.set(new Uint8Array(encrypted), iv.length);
-
-      const blob = new Blob([combined]);
-      const url = URL.createObjectURL(blob);
-      const fileName = generateRandomFileName() + ".enc";
-      downloadLink.href = url;
-      downloadLink.download = fileName;
-      downloadLink.style.display = "inline-block";
-
-      const rawKey = await crypto.subtle.exportKey("raw", key);
-      const keyHex = bufferToHex(rawKey);
-      status.innerHTML = `Enkripsi selesai.<br><strong class="font-semibold">Kunci HEX:</strong> <span class="font-mono text-sm">${keyHex}</span>`;
-    });
-
-    // Dekripsi
-    document.getElementById('decryptBtn').addEventListener('click', async () => {
-      const fileInput = document.getElementById('fileInputDec');
-      const keyInput = document.getElementById('keyInput');
-      const ext = document.getElementById('fileTypeSelect').value;
-      const status = document.getElementById('statusDec');
-      const downloadLink = document.getElementById('downloadLinkDec');
-      const preview = document.getElementById('previewContainer');
-
-      status.textContent = "Memproses dekripsi...";
-      preview.innerHTML = "";
-      downloadLink.style.display = "none";
-
-      if (!fileInput.files.length || !keyInput.value.trim()) {
-        status.textContent = "Masukkan file dan kunci HEX.";
-        return;
-      }
-
-      try {
-        const decrypted = await decryptFile(fileInput.files[0], keyInput.value.trim());
-        const blob = new Blob([decrypted]);
-        const url = URL.createObjectURL(blob);
-        downloadLink.href = url;
-        downloadLink.download = "hasil_dekripsi." + ext;
-        downloadLink.style.display = "inline-block";
-        status.textContent = "Dekripsi berhasil.";
-
-        if (["jpg", "jpeg", "png"].includes(ext)) {
-          const img = document.createElement("img");
-          img.src = url;
-          img.classList.add("mt-3", "rounded-md", "shadow-md");
-          preview.appendChild(img);
-        } else if (ext === "mp4") {
-          const video = document.createElement("video");
-          video.src = url;
-          video.controls = true;
-          video.style.maxWidth = "100%";
-          video.classList.add("mt-3", "rounded-md", "shadow-md");
-          preview.appendChild(video);
+    <meta charset="UTF-8">
+    <title>Enkripsi & Dekripsi File Aman</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide-react@latest/umd/lucide-react.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f9fafb;
+            --text-color: #1f2937;
+            --primary-color: #8b5cf6;
+            --primary-hover: #a855f7;
+            --secondary-color: #e5e7eb;
+            --secondary-hover: #f3f4f6;
+            --success-color: #16a34a;
+            --success-hover: #15803d;
+            --border-color: #d1d5db;
+            --input-bg: #fff;
+            --input-border: #d1d5db;
+            --box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            --rounded-md: 0.375rem;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
         }
 
-      } catch (e) {
-        status.textContent = "Gagal dekripsi: " + e.message;
-      }
-    });
-  </script>
+        .dark {
+            --bg-color: #111827;
+            --text-color: #f9fafb;
+            --primary-color: #8b5cf6;
+            --primary-hover: #a855f7;
+            --secondary-color: #374151;
+            --secondary-hover: #4b5563;
+            --success-color: #14e5b0;
+            --success-hover: #06d6a0;
+            --border-color: #4b5563;
+            --input-bg: #374151;
+            --input-border: #6b7280;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: var(--bg-color);
+            padding: 2rem;
+            border-radius: var(--rounded-md);
+            margin-top: 1.5rem;
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .heading-primary {
+            margin-bottom: 1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 1.875rem;
+        }
+
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            padding: 0.75rem 0;
+            background-color: transparent;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            color: var(--text-color);
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: color 0.3s, border-color 0.3s, background-color 0.3s;
+            border-radius: var(--rounded-md) var(--rounded-md) 0 0;
+            background-color: var(--secondary-color);
+        }
+
+        .tab-button:hover {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background-color: var(--secondary-hover);
+        }
+
+        .tab-button.active {
+            color: #fff;
+            border-bottom-color: var(--success-color);
+            background-color: var(--success-color);
+            font-weight: 700;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 1.25rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-label {
+            display: block;
+            margin-top: 0.75rem;
+            margin-bottom: 0.375rem;
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 0.875rem;
+        }
+
+        .input-text, .select-input {
+            padding: 0.75rem;
+            width: calc(100% - 2rem);
+            border-radius: var(--rounded-md);
+            border: 2px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            transition: border-color 0.2s, background-color 0.2s;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .input-text:focus, .select-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .button-primary {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--rounded-md);
+            border: none;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            display: block;
+            margin: 1rem auto;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .button-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-primary:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .status-message {
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-color);
+            text-align: center;
+            padding: 0.75rem;
+            background-color: var(--secondary-color);
+            border-radius: var(--rounded-md);
+            border: 1px solid var(--border-color);
+            word-wrap: break-word;
+            overflow-x: auto;
+            max-width: 100%;
+            font-family: var(--font-mono);
+        }
+
+        .download-link {
+            display: inline-block;
+            margin-top: 1rem;
+            background-color: var(--success-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--rounded-md);
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.2s;
+            text-align: center;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 1rem;
+        }
+
+        .download-link:hover {
+            background-color: var(--success-hover);
+            transform: translateY(-2px);
+        }
+
+        #previewContainer {
+            margin-top: 1.5rem;
+            text-align: center;
+            border: 2px dashed var(--border-color);
+            padding: 1rem;
+            border-radius: var(--rounded-md);
+            background-color: var(--secondary-color);
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        #previewContainer img, #previewContainer video {
+            max-width: 100%;
+            margin-top: 0.75rem;
+            border-radius: var(--rounded-md);
+            box-shadow: var(--box-shadow);
+        }
+
+        .settings-button {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            padding: 0.5rem;
+            border-radius: 9999px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            border: 1px solid var(--border-color);
+        }
+
+        .settings-button:hover {
+            background-color: var(--secondary-hover);
+            color: var(--primary-color);
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 3.5rem;
+            right: 1.5rem;
+            background-color: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: var(--rounded-md);
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--border-color);
+            width: 250px;
+            z-index: 10;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+        }
+
+        .settings-panel.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .settings-panel label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .settings-panel input[type="number"],
+        .settings-panel select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: var(--rounded-md);
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .settings-panel input[type="number"]:focus,
+        .settings-panel select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .settings-panel button {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--rounded-md);
+            border: none;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.2s;
+            width: 100%;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .settings-panel button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .settings-panel button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem;
+                margin-top: 1rem;
+            }
+
+            .tab-container {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                width: 100%;
+                border-bottom: 2px solid transparent;
+                border-radius: 0;
+            }
+
+            .tab-button:not(.active) {
+                background-color: var(--secondary-hover);
+            }
+
+            .input-text, .select-input {
+                width: calc(100% - 1.5rem);
+            }
+
+            .settings-button {
+                top: 1rem;
+                right: 1rem;
+            }
+
+            .settings-panel {
+                top: 3rem;
+                right: 1rem;
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+    <div class="settings-button" id="settingsBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-2"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><path d="M12 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/><path d="M12 2v2"/><path d="M12 22v-2"/><path d="M18 6l-1.4-1.4"/><path d="M7.4 16.6L6 18"/><path d="M22 12h-2"/><path d="M2 12h2"/><path d="M18 18l-1.4 1.4"/><path d="M7.4 7.4L6 6"/></svg>
+    </div>
+    <div class="settings-panel" id="settingsPanel">
+        <label for="keyLength">Panjang Kunci (HEX):</label>
+        <input type="number" id="keyLength" value="64" min="32" step="8">
+        <label for="darkMode">Mode Gelap:</label>
+        <select id="darkMode">
+            <option value="auto">Otomatis</option>
+            <option value="dark">Aktif</option>
+            <option value="light">Nonaktif</option>
+        </select>
+        <button id="saveSettings">Simpan Pengaturan</button>
+    </div>
+
+    <div class="container">
+        <h1 class="heading-primary">Enkripsi & Dekripsi File</h1>
+        <div class="tab-container">
+            <div class="tab-button active" data-tab="encryptTab">Enkripsi</div>
+            <div class="tab-button" data-tab="decryptTab">Dekripsi</div>
+        </div>
+
+        <div id="encryptTab" class="tab-content active">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Enkripsi File</h2>
+            <label for="fileInputEnc" class="form-label">Pilih file:</label>
+            <input type="file" id="fileInputEnc" class="input-text">
+            <button id="encryptBtn" class="button-primary">Enkripsi</button>
+            <p id="statusEnc" class="status-message"></p>
+            <a id="downloadLinkEnc" class="download-link" style="display:none;">Download Enkripsi</a>
+        </div>
+
+        <div id="decryptTab" class="tab-content">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Dekripsi File</h2>
+            <div class="md:flex md:space-x-8">
+                <div class="md:w-1/2">
+                    <label for="fileInputDec" class="form-label">Pilih file terenkripsi:</label>
+                    <input type="file" id="fileInputDec" class="input-text">
+                    <label for="keyInput" class="form-label">Kunci HEX:</label>
+                    <input type="text" id="keyInput" placeholder="Masukkan kunci HEX" class="input-text">
+                    <label for="fileTypeSelect" class="form-label">Pilih ekstensi hasil dekripsi:</label>
+                    <select id="fileTypeSelect" class="select-input">
+                        <option value="txt">.txt</option>
+                        <option value="png">.png</option>
+                        <option value="jpg">.jpg</option>
+                        <option value="mp4">.mp4</option>
+                        <option value="zip">.zip</option>
+                        <option value="rar">.rar</option>
+                    </select>
+                    <button id="decryptBtn" class="button-primary">Dekripsi</button>
+                </div>
+                <div class="md:w-1/2">
+                    <p id="statusDec" class="status-message"></p>
+                    <a id="downloadLinkDec" class="download-link" style="display:none;">Download Dekripsi</a>
+                    <div id="previewContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk menghasilkan nama file acak
+        function generateRandomFileName(length = 24) {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let randomName = '';
+            for (let i = 0; i < length; i++) {
+                randomName += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return randomName;
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                button.classList.add('active');
+                document.getElementById(button.dataset.tab).classList.add('active');
+            });
+        });
+
+        function readFileAsArrayBuffer(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function bufferToHex(buffer) {
+            return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function hexToBuffer(hex) {
+            return new Uint8Array(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16))).buffer;
+        }
+
+        async function generateKey(length = 256) {
+          if (length !== 256 && length !== 192 && length !== 128) {
+            throw new Error("Panjang kunci harus 128, 192, atau 256 bits.");
+          }
+            return await crypto.subtle.generateKey({ name: "AES-GCM", length: length }, true, ["encrypt", "decrypt"]);
+        }
+
+        async function encryptFile(file, key) {
+            const buffer = await readFileAsArrayBuffer(file);
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, buffer);
+            return { encrypted, iv };
+        }
+
+        async function decryptFile(file, keyHex) {
+            const buffer = await readFileAsArrayBuffer(file);
+            const data = new Uint8Array(buffer);
+            const iv = data.slice(0, 12);
+            const content = data.slice(12);
+            const key = await crypto.subtle.importKey("raw", hexToBuffer(keyHex), "AES-GCM", false, ["decrypt"]);
+            return await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, content);
+        }
+
+        // Enkripsi
+        document.getElementById('fileInputEnc').addEventListener('change', () => {
+            document.getElementById('statusEnc').textContent = "";
+            document.getElementById('downloadLinkEnc').style.display = "none";
+        });
+
+        document.getElementById('encryptBtn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('fileInputEnc');
+            const status = document.getElementById('statusEnc');
+            const downloadLink = document.getElementById('downloadLinkEnc');
+            const keyLength = parseInt(document.getElementById('keyLength').value);
+
+
+            if (!fileInput.files.length) {
+                status.textContent = "Pilih file terlebih dahulu.";
+                return;
+            }
+
+            status.textContent = "Memproses enkripsi...";
+            const file = fileInput.files[0];
+            try {
+                const key = await generateKey(keyLength);
+                const { encrypted, iv } = await encryptFile(file, key);
+
+                const combined = new Uint8Array(iv.length + encrypted.byteLength);
+                combined.set(iv);
+                combined.set(new Uint8Array(encrypted), iv.length);
+
+                const blob = new Blob([combined]);
+                const url = URL.createObjectURL(blob);
+                const fileName = generateRandomFileName() + ".enc";
+                downloadLink.href = url;
+                downloadLink.download = fileName;
+                downloadLink.style.display = "inline-block";
+
+                const rawKey = await crypto.subtle.exportKey("raw", key);
+                const keyHex = bufferToHex(rawKey);
+                status.innerHTML = `Enkripsi selesai.<br><strong class="font-semibold">Kunci HEX:</strong> <span class="font-mono text-sm">${keyHex}</span>`;
+            } catch (error) {
+                 status.textContent = "Error: " + error.message;
+            }
+        });
+
+        // Dekripsi
+        document.getElementById('decryptBtn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('fileInputDec');
+            const keyInput = document.getElementById('keyInput');
+            const ext = document.getElementById('fileTypeSelect').value;
+            const status = document.getElementById('statusDec');
+            const downloadLink = document.getElementById('downloadLinkDec');
+            const preview = document.getElementById('previewContainer');
+
+            status.textContent = "Memproses dekripsi...";
+            preview.innerHTML = "";
+            downloadLink.style.display = "none";
+
+            if (!fileInput.files.length || !keyInput.value.trim()) {
+                status.textContent = "Masukkan file dan kunci HEX.";
+                return;
+            }
+
+            try {
+                const decrypted = await decryptFile(fileInput.files[0], keyInput.value.trim());
+                const blob = new Blob([decrypted]);
+                const url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = "hasil_dekripsi." + ext;
+                downloadLink.style.display = "inline-block";
+                status.textContent = "Dekripsi berhasil.";
+
+                if (["jpg", "jpeg", "png"].includes(ext)) {
+                    const img = document.createElement("img");
+                    img.src = url;
+                    img.classList.add("mt-3", "rounded-md", "shadow-md");
+                    preview.appendChild(img);
+                } else if (ext === "mp4") {
+                    const video = document.createElement("video");
+                    video.src = url;
+                    video.controls = true;
+                    video.style.maxWidth = "100%";
+                    video.classList.add("mt-3", "rounded-md", "shadow-md");
+                    preview.appendChild(video);
+                }
+
+            } catch (e) {
+                status.textContent = "Gagal dekripsi: " + e.message;
+            }
+        });
+
+        // Settings Panel
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const saveSettingsBtn = document.getElementById('saveSettings');
+        const darkModeSelect = document.getElementById('darkMode');
+        const keyLengthInput = document.getElementById('keyLength');
+
+        let isSettingsOpen = false;
+
+        settingsBtn.addEventListener('click', () => {
+            isSettingsOpen = !isSettingsOpen;
+            settingsPanel.classList.toggle('active', isSettingsOpen);
+        });
+
+        saveSettingsBtn.addEventListener('click', () => {
+            const darkModeValue = darkModeSelect.value;
+            const keyLength = parseInt(keyLengthInput.value);
+
+            if (darkModeValue === 'dark') {
+                document.body.classList.add('dark');
+            } else if (darkModeValue === 'light') {
+                document.body.classList.remove('dark');
+            } else {
+                const jam = new Date().getHours();
+                if (jam >= 18 || jam < 6) {
+                    document.body.classList.add('dark');
+                } else {
+                    document.body.classList.remove('dark');
+                }
+            }
+
+            if (keyLength !== 128 && keyLength !== 192 && keyLength !== 256) {
+                alert("Panjang kunci harus 128, 192, atau 256 bits. Menggunakan 256 sebagai default.");
+                keyLengthInput.value = 256;
+            }
+
+            isSettingsOpen = false;
+            settingsPanel.classList.remove('active');
+        });
+
+        // Initial dark mode setup
+        const savedDarkMode = localStorage.getItem('darkMode');
+        if (savedDarkMode) {
+            darkModeSelect.value = savedDarkMode;
+            if (savedDarkMode === 'dark') {
+                document.body.classList.add('dark');
+            } else if (savedDarkMode === 'light') {
+                document.body.classList.remove('dark');
+            } else {
+                const jam = new Date().getHours();
+                if (jam >= 18 || jam < 6) {
+                    document.body.classList.add('dark');
+                }
+            }
+        } else {
+            const jam = new Date().getHours();
+            if (jam >= 18 || jam < 6) {
+                document.body.classList.add('dark');
+                darkModeSelect.value = 'auto';
+            }
+        }
+    </script>
 </body>
 </html>
