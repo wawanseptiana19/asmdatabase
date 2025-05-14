@@ -94,6 +94,7 @@
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         .button-section button {
             padding: 12px 24px;
@@ -124,11 +125,11 @@
         #downloadAllBtn:hover {
             background-color: #2980b9;
         }
-        #toggleDarkMode {
+        #settingsBtn {
             background-color: #f1c40f;
             color: #2c3e50;
         }
-        #toggleDarkMode:hover {
+        #settingsBtn:hover {
             background-color: #f0b207;
         }
         .status-section {
@@ -304,6 +305,116 @@
         #hiddenCanvas {
             display: none;
         }
+
+        /* Style untuk Konten Pengaturan */
+        .settings-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            z-index: 11;
+            width: 300px;
+            max-width: 95%;
+            height: auto;
+            overflow-y: auto;
+            transition: background-color 0.3s ease;
+        }
+
+        .settings-panel.dark-mode {
+            background-color: #2d3748;
+            color: #fff;
+        }
+
+        .settings-panel h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #2c3e50;
+            transition: color 0.3s ease;
+        }
+        .settings-panel.dark-mode h2{
+            color: #fff;
+        }
+
+        .settings-panel label {
+            display: block;
+            margin-bottom: 5px;
+            color: #34495e;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .settings-panel.dark-mode label {
+            color: #fff;
+        }
+
+        .settings-panel input[type="number"] {
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            width: calc(100% - 20px);
+            transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .settings-panel.dark-mode input[type="number"] {
+            border-color: #718096;
+            background-color: #2d3748;
+            color: #fff;
+        }
+
+        .settings-panel .button-section {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            margin-bottom: 0;
+        }
+
+        .settings-panel .button-section button {
+            padding: 10px 20px;
+        }
+
+        .settings-panel .close-button {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .settings-panel .close-button:hover {
+            background-color: #c0392b;
+        }
+
+        .settings-panel .save-button {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .settings-panel .save-button:hover {
+            background-color: #27ae60;
+        }
+
+        .settings-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            /* Style untuk icon gear, bisa disesuaikan */
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20v-8m0-4V4M6 20h12M6 8h12M6 12h12m-6 4h6'%3E%3C/path%3E%3Circle cx='12' cy='12' r='2'%3E%3C/circle%3E%3C/svg%3E") no-repeat center center;
+            background-size: cover;
+            display: inline-block;
+            vertical-align: middle;
+            transition: transform 0.2s ease;
+        }
+
+        .settings-icon:hover {
+            transform: rotate(180deg);
+        }
+
     </style>
 </head>
 <body>
@@ -321,7 +432,7 @@
         <div class="button-section">
             <button id="extractBtn" disabled>Ekstrak Frame</button>
             <button id="downloadAllBtn" disabled>Download Semua Frame</button>
-            <button id="toggleDarkMode">Mode Gelap</button>
+            <button id="settingsBtn"><span class="settings-icon"></span> Pengaturan</button>
         </div>
         <div id="status" class="status-section">Pilih file video untuk memulai.</div>
         <div class="progress-bar">
@@ -336,6 +447,17 @@
             <button class="modal-download">Download</button>
             <button class="modal-close">Tutup</button>
             <button class="nav-btn prev-btn">❮</button> <button class="nav-btn next-btn">❯</button> <img id="modalImg" src="" alt="Full Frame" />
+            <p id="modalTime" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 1rem;"></p>
+        </div>
+    </div>
+
+    <div id="settingsPanel" class="settings-panel">
+        <h2>Pengaturan</h2>
+        <label for="darkModeToggle">Mode Gelap:</label>
+        <button id="toggleDarkMode">Mode Gelap</button>
+        <div class="button-section">
+            <button id="saveSettingsBtn" class="save-button">Simpan</button>
+            <button id="closeSettingsBtn" class="close-button">Tutup</button>
         </div>
     </div>
 
@@ -347,6 +469,7 @@
         const fpsInput = document.getElementById('fpsInput');
         const extractBtn = document.getElementById('extractBtn');
         const downloadAllBtn = document.getElementById('downloadAllBtn');
+        const settingsBtn = document.getElementById('settingsBtn'); // Correct ID
         const toggleDarkModeBtn = document.getElementById('toggleDarkMode');
         const statusDiv = document.getElementById('status');
         const gallery = document.getElementById('gallery');
@@ -360,12 +483,19 @@
         const btnDownload = modal.querySelector('.modal-download');
         const prevBtn = modal.querySelector('.prev-btn');
         const nextBtn = modal.querySelector('.next-btn');
+        const modalTime = document.getElementById('modalTime');
+
+        // Pengaturan Panel
+        const settingsPanel = document.getElementById('settingsPanel');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 
         let userFPS = 25;
         let totalFrames = 0;
         let processedFrames = 0;
         let fileType;
         let frameDataURLs = [];
+        let frameTimes = []; // Array to store frame times
 
         const progressBarFill = document.getElementById('progressBarFill');
         const progressBarText = document.getElementById('progressBarText');
@@ -387,6 +517,9 @@
             document.querySelector('.progress-bar-text').classList.add('dark-mode');
             document.querySelectorAll('.nav-btn').forEach(button => button.classList.add('dark-mode'));
             document.querySelectorAll('.modal-content').forEach(mc => mc.classList.add('dark-mode'));
+            settingsPanel.classList.add('dark-mode');
+            document.querySelectorAll('.settings-panel label').forEach(label => label.classList.add('dark-mode'));
+            document.querySelectorAll('.settings-panel input[type="number"]').forEach(input => input.classList.add('dark-mode'));
             isDarkMode = true;
             toggleDarkModeBtn.textContent = 'Mode Terang';
         }
@@ -395,7 +528,7 @@
         function disableDarkMode() {
             document.body.classList.remove('dark-mode');
             document.querySelector('.container').classList.remove('dark-mode');
-             document.querySelector('header').classList.remove('dark-mode');
+            document.querySelector('header').classList.remove('dark-mode');
             document.querySelector('header h1').classList.remove('dark-mode');
             document.querySelector('header p').classList.remove('dark-mode');
             document.querySelector('.input-section').classList.remove('dark-mode');
@@ -406,6 +539,9 @@
             document.querySelector('.progress-bar-text').classList.remove('dark-mode');
             document.querySelectorAll('.nav-btn').forEach(button => button.classList.remove('dark-mode'));
             document.querySelectorAll('.modal-content').forEach(mc => mc.classList.remove('dark-mode'));
+            settingsPanel.classList.remove('dark-mode');
+            document.querySelectorAll('.settings-panel label').forEach(label => label.classList.remove('dark-mode'));
+            document.querySelectorAll('.settings-panel input[type="number"]').forEach(input => input.classList.remove('dark-mode'));
             isDarkMode = false;
             toggleDarkModeBtn.textContent = 'Mode Gelap';
         }
@@ -446,12 +582,13 @@
             processedFrames = 0;
             updateProgressBar(0);
             frameDataURLs = [];
+            frameTimes = []; // Reset frame times array
             currentImageIndex = 0;
         });
 
         fpsInput.addEventListener('change', () => {
             const val = parseInt(fpsInput.value, 10);
-            if (val >= 1 && val <= 60) userFPS = val;
+            if (val >= 1 && val <= 60) userFPS =val;
             else fpsInput.value = userFPS;
         });
 
@@ -490,6 +627,7 @@
             processedFrames = 0;
             updateProgressBar(0);
             frameDataURLs = [];
+            frameTimes = []; // Reset frame times array
             currentImageIndex = 0;
             captureLoop(0);
         }
@@ -507,10 +645,12 @@
                 ctx.drawImage(hiddenVideo, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
                 const dataURL = hiddenCanvas.toDataURL('image/jpeg');
                 frameDataURLs.push(dataURL);
+                frameTimes.push(i / userFPS); // Store the time of the frame
                 const img = document.createElement('img');
                 img.src = dataURL;
                 img.alt = `Frame ${i}`;
                 img.dataset.full = dataURL;
+                img.dataset.time = (i / userFPS).toFixed(2); // Store time as dataset
                 img.addEventListener('click', () => openModal(i));
                 gallery.appendChild(img);
                 hiddenVideo.removeEventListener('seeked', onSeeked);
@@ -541,11 +681,13 @@
             modalImg.style.maxHeight = '95%';
             prevBtn.disabled = index === 0;
             nextBtn.disabled = index === frameDataURLs.length - 1;
+            modalTime.textContent = `Waktu: ${frameTimes[index]} detik`; // Display the time
         }
 
         btnClose.addEventListener('click', () => {
             modal.style.display = 'none';
             modalImg.src = '';
+            modalTime.textContent = '';
         });
 
         modal.addEventListener('click', e => {
@@ -565,6 +707,26 @@
                 openModal(currentImageIndex);
             }
         });
+
+        // Pengaturan Panel Event Listeners
+        settingsBtn.addEventListener('click', () => {
+            settingsPanel.style.display = 'block';
+        });
+
+        closeSettingsBtn.addEventListener('click', () => {
+            settingsPanel.style.display = 'none';
+        });
+
+        saveSettingsBtn.addEventListener('click', () => {
+            userFPS = parseInt(fpsInput.value, 10);
+            if (isNaN(userFPS) || userFPS < 1 || userFPS > 60) {
+                alert('FPS harus berupa angka antara 1 dan 60.');
+                fpsInput.value = 25;
+                userFPS = 25;
+            }
+            settingsPanel.style.display = 'none';
+        });
+
     </script>
 </body>
 </html>
