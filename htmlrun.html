@@ -1,685 +1,705 @@
 <!DOCTYPE html>
+
 <html lang="id">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Advanced HTML Runner - Super Canggih</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-darker.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/eclipse.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            padding-top: 20px;
-        }
-        .CodeMirror {
-            height: 300px;
-        }
-        .nav-tabs .nav-link {
-            font-weight: bold;
-        }
-        #preview {
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            width: 100%;
-            height: 400px;
-            background-color: white; /* Set background color for the preview iframe */
-        }
-        #console {
-            background-color: #1e1e1e;
-            color: #f1f1f1;
-            padding: 10px;
-            height: 150px;
-            overflow-y: auto;
-            border-radius: 0.25rem;
-            font-family: monospace;
-            margin-bottom: 10px; /* Add margin for spacing */
-        }
-        #consoleInput {
-            margin-top: 5px;
-        }
-        .loader {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            border-radius: 5px;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            z-index: 1000;
-            display: none; /* Hidden by default, show when loading */
-        }
-        .CodeMirror-lint-marker-error, .CodeMirror-lint-marker-warning {
-            background: red; /* Make errors more visible */
-            color: white;
-            padding: 0 5px;
-            border-radius: 3px;
-            font-family: monospace;
-        }
-        .CodeMirror-lint-message-error, .CodeMirror-lint-message-warning {
-            color: red; /* Error messages in red */
-        }
-    </style>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Advanced HTML Runner - Super Canggih</title>
+
+  <!-- Bootstrap CSS -->
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- CodeMirror CSS -->
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+
+  <!-- Tema CodeMirror Default -->
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-darker.min.css">
+
+  <!-- Tema tambahan -->
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/eclipse.min.css">
+
+  <style>
+
+    body {
+
+      background-color: #f8f9fa;
+
+      padding-top: 20px;
+
+    }
+
+    .CodeMirror {
+
+      height: 300px;
+
+    }
+
+    .nav-tabs .nav-link {
+
+      font-weight: bold;
+
+    }
+
+    #preview {
+
+      border: 1px solid #ced4da;
+
+      border-radius: 0.25rem;
+
+      width: 100%;
+
+      height: 400px;
+
+    }
+
+    #console {
+
+      background-color: #1e1e1e;
+
+      color: #f1f1f1;
+
+      padding: 10px;
+
+      height: 150px;
+
+      overflow-y: auto;
+
+      border-radius: 0.25rem;
+
+      font-family: monospace;
+
+    }
+
+    #consoleInput {
+
+      margin-top: 5px;
+
+    }
+
+  </style>
+
 </head>
+
 <body>
-    <div class="container">
-        <div class="mb-4 text-center">
-            <h1>Advanced HTML Runner - Super Canggih</h1>
-            <p>Editor dengan preview real-time, autosave, ekspor/impor project, pilihan tema, error console, live collaboration, dan integrasi library.</p>
-        </div>
 
-        <ul class="nav nav-tabs" id="editorTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="html-tab" data-bs-toggle="tab" data-bs-target="#html" type="button" role="tab" aria-controls="html" aria-selected="true">HTML</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="css-tab" data-bs-toggle="tab" data-bs-target="#css" type="button" role="tab" aria-controls="css" aria-selected="false">CSS</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="js-tab" data-bs-toggle="tab" data-bs-target="#js" type="button" role="tab" aria-controls="js" aria-selected="false">JavaScript</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="libraries-tab" data-bs-toggle="tab" data-bs-target="#libraries" type="button" role="tab" aria-controls="libraries" aria-selected="false">Libraries</button>
-            </li>
-        </ul>
-        <div class="tab-content" id="editorTabContent">
-            <div class="tab-pane fade show active" id="html" role="tabpanel" aria-labelledby="html-tab">
-                <textarea id="htmlEditor"></textarea>
-            </div>
-            <div class="tab-pane fade" id="css" role="tabpanel" aria-labelledby="css-tab">
-                <textarea id="cssEditor"></textarea>
-            </div>
-            <div class="tab-pane fade" id="js" role="tabpanel" aria-labelledby="js-tab">
-                <textarea id="jsEditor"></textarea>
-            </div>
-            <div class="tab-pane fade" id="libraries" role="tabpanel" aria-labelledby="libraries-tab">
-                <div class="mt-3">
-                    <label for="librarySelect" class="form-label">Pilih Library:</label>
-                    <select id="librarySelect" class="form-select">
-                        <option value="">Pilih...</option>
-                        <option value="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js">jQuery</option>
-                        <option value="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">Bootstrap</option>
-                        <option value="https://unpkg.com/lodash@4.17.21/lodash.min.js">Lodash</option>
-                        <option value="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js">SweetAlert2</option>
-                        </select>
-                    <button class="btn btn-secondary mt-2" onclick="addLibrary()">Tambahkan Library</button>
-                    <div id="loadedLibraries" class="mt-2">
-                        <strong>Loaded Libraries:</strong>
-                        <ul id="libraryList" style="list-style: none; padding-left: 0;">
-                            </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="container">
 
-        <div class="mt-3 d-flex flex-wrap gap-2">
-            <button class="btn btn-primary flex-fill" onclick="runCode()">Jalankan Kode</button>
-            <button class="btn btn-success flex-fill" onclick="downloadCode()">Download Kode</button>
-            <button class="btn btn-info flex-fill" onclick="toggleFullScreen()">Full Screen Preview</button>
-            <button class="btn btn-warning flex-fill" onclick="resetCode()">Reset Editor</button>
-            <button class="btn btn-secondary flex-fill" onclick="clearAutosave()">Hapus Autosave</button>
-            <button class="btn btn-dark flex-fill" onclick="exportProject()">Ekspor Project</button>
-            <button class="btn btn-secondary flex-fill">
-                <label class="mb-0">Impor Project:
-                    <input type="file" id="importFile" accept=".json" onchange="importProject(event)" style="display:none;">
-                    <span class="btn btn-sm btn-outline-light" onclick="document.getElementById('importFile').click()">Pilih File</span>
-                </label>
-            </button>
-            <div class="flex-fill">
-                <select id="themeSelector" class="form-select" onchange="changeTheme(this.value)">
-                    <option value="material-darker">Material Darker</option>
-                    <option value="eclipse">Eclipse</option>
-                </select>
-            </div>
-            <button id="collaborateBtn" class="btn btn-danger flex-fill" onclick="startCollaboration()">Mulai Kolaborasi</button>
-        </div>
+    <!-- Header -->
 
-        <div class="mt-4 row">
-            <div class="col-md-8">
-                <h4>Preview</h4>
-                <iframe id="preview" title="Preview Output"></iframe>
-                <button class="btn btn-primary mt-2" onclick="openInNewTab()">Buka di tab baru</button>
-            </div>
-            <div class="col-md-4">
-                <h4>Console</h4>
-                <div id="console"></div>
-                <input type="text" id="consoleInput" class="form-control" placeholder="Ketik perintah di sini...">
-            </div>
-        </div>
-    </div>
-    <div class="loader" id="loadingIndicator">Loading...</div>
+    <div class="mb-4 text-center">
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/lint/lint.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/lint/html-lint.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/lint/css-lint.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/lint/javascript-lint.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jshint@2.13.6/dist/jshint.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/htmlhint/1.1.0/htmlhint.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closetag.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js"></script>
-    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+      <h1>Advanced HTML Runner - Super Canggih</h1>
 
-    <script>
-        // Inisialisasi CodeMirror dengan tema default dari selector
-        var htmlEditor = CodeMirror.fromTextArea(document.getElementById("htmlEditor"), {
-            mode: "text/html",
-            theme: "material-darker",
-            lineNumbers: true,
-            autoCloseTags: true,
-            lint: true, // Enable linting
-        });
-        var cssEditor = CodeMirror.fromTextArea(document.getElementById("cssEditor"), {
-            mode: "css",
-            theme: "material-darker",
-            lineNumbers: true,
-            autoCloseBrackets: true,
-            lint: true, // Enable linting
-        });
-        var jsEditor = CodeMirror.fromTextArea(document.getElementById("jsEditor"), {
-            mode: "javascript",
-            theme: "material-darker",
-            lineNumbers: true,
-            autoCloseBrackets: true,
-            lint: true, // Enable linting
-        });
+      <p>Editor dengan preview real-time, autosave, ekspor/impor project, pilihan tema, dan error console.</p>
 
-        // Fungsi debounce untuk auto-run
-        function debounce(func, delay) {
-            let timer;
-            return function() {
-                clearTimeout(timer);
-                timer = setTimeout(() => func.apply(this, arguments), delay);
-            }
-        }
+    </div>
 
-        // Menampilkan pesan di console panel
-        function logConsole(message, type = 'info') {
-            const consoleDiv = document.getElementById("console");
-            const p = document.createElement("p");
-            p.textContent = message;
-             if (type === 'error') {
-                p.style.color = 'red';
-             } else if (type === 'warning'){
-                p.style.color = 'yellow'
-             }
-            consoleDiv.appendChild(p);
-            consoleDiv.scrollTop = consoleDiv.scrollHeight;
-        }
 
-        // Fungsi untuk menjalankan kode pada iframe preview dan menyertakan error handling
-        function runCode() {
-            showLoading();
-            var htmlContent = htmlEditor.getValue();
-            var cssContent = "<style>" + cssEditor.getValue() + "</style>";
-            var jsContent = "<script>" +
-                // Menangkap error dan mengirimkan pesan ke parent
-                "window.onerror = function(msg, url, line, col, error) {" +
-                "  parent.postMessage({type: 'console', message: '[ERROR] ' + msg + ' (line: ' + line + ')' }, '*');" +
-                "  return true;" + // Prevent default error handling to avoid double reporting
-                "};" +
-                jsEditor.getValue() +
-                "<\/script>";
 
-            var combinedCode = htmlContent + cssContent + jsContent;
-            document.getElementById("preview").srcdoc = combinedCode;
-            autosaveCode();
-            // Bersihkan console setiap kali run
-            document.getElementById("console").innerHTML = "";
-            hideLoading();
-        }
+    <!-- Editor Tab -->
 
-        // Auto-run saat pengguna mengetik (debounced)
-        var debouncedRun = debounce(runCode, 500);
-        htmlEditor.on("change", debouncedRun);
-        cssEditor.on("change", debouncedRun);
-        jsEditor.on("change", debouncedRun);
+    <ul class="nav nav-tabs" id="editorTab" role="tablist">
 
-        // Fungsi untuk mengunduh kode sebagai file HTML
-        function downloadCode() {
-            var htmlContent = htmlEditor.getValue();
-            var cssContent = "<style>" + cssEditor.getValue() + "</style>";
-            var jsContent = "<script>" + jsEditor.getValue() + "<\/script>";
-            var combinedCode = htmlContent + "\n" + cssContent + "\n" + jsContent;
-            var blob = new Blob([combinedCode], { type: 'text/html' });
-            var a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'kode.html';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
+      <li class="nav-item" role="presentation">
 
-        // Fungsi untuk toggle full screen preview menggunakan Fullscreen API
-        function toggleFullScreen() {
-            var previewElement = document.getElementById("preview");
-            if (!document.fullscreenElement) {
-                previewElement.requestFullscreen().catch(err => {
-                    alert("Error, tidak dapat masuk full screen: " + err.message);
-                });
-            } else {
-                document.exitFullscreen();
-            }
-        }
+        <button class="nav-link active" id="html-tab" data-bs-toggle="tab" data-bs-target="#html" type="button" role="tab" aria-controls="html" aria-selected="true">HTML</button>
 
-        // Fungsi untuk mereset editor dan preview
-        function resetCode() {
-            Swal.fire({
-                title: 'Reset Editor?',
-                text: "Apakah Anda yakin ingin mereset editor? Kode yang ada akan dihapus.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Reset!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    htmlEditor.setValue("");
-                    cssEditor.setValue("");
-                    jsEditor.setValue("");
-                    document.getElementById("preview").srcdoc = "";
-                    document.getElementById("console").innerHTML = "";
-                    autosaveCode(); // update localStorage
-                    Swal.fire(
-                        'Reset!',
-                        'Editor telah direset.',
-                        'success'
-                    );
-                }
-            });
-        }
+      </li>
 
-        // Autosave menggunakan localStorage
-        function autosaveCode() {
-            const codeData = {
-                html: htmlEditor.getValue(),
-                css: cssEditor.getValue(),
-                js: jsEditor.getValue()
-            };
-            localStorage.setItem("advancedHtmlRunnerCode", JSON.stringify(codeData));
-        }
+      <li class="nav-item" role="presentation">
 
-        // Memuat kode dari localStorage
-        function loadAutosave() {
-            const saved = localStorage.getItem("advancedHtmlRunnerCode");
-            if (saved) {
-                try {
-                    const codeData = JSON.parse(saved);
-                    htmlEditor.setValue(codeData.html || "");
-                    cssEditor.setValue(codeData.css || "");
-                    jsEditor.setValue(codeData.js || "");
-                    runCode();
-                } catch(e) {
-                    console.error("Gagal memuat autosave:", e);
-                    logConsole("Gagal memuat autosave. LocalStorage mungkin rusak.", 'error');
-                }
-            }
-        }
+        <button class="nav-link" id="css-tab" data-bs-toggle="tab" data-bs-target="#css" type="button" role="tab" aria-controls="css" aria-selected="false">CSS</button>
 
-        // Hapus data autosave
-        function clearAutosave() {
-            Swal.fire({
-                title: 'Hapus Autosave?',
-                text: "Apakah Anda yakin ingin menghapus data autosave?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    localStorage.removeItem("advancedHtmlRunnerCode");
-                    Swal.fire(
-                        'Terhapus!',
-                        'Data autosave telah dihapus.',
-                        'success'
-                    );
-                }
-            });
-        }
+      </li>
 
-        // Ekspor project sebagai file JSON
-        function exportProject() {
-            const projectData = {
-                html: htmlEditor.getValue(),
-                css: cssEditor.getValue(),
-                js: jsEditor.getValue()
-            };
-            const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'project.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
+      <li class="nav-item" role="presentation">
 
-        // Impor project dari file JSON
-        function importProject(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const projectData = JSON.parse(e.target.result);
-                    htmlEditor.setValue(projectData.html || "");
-                    cssEditor.setValue(projectData.css || "");
-                    jsEditor.setValue(projectData.js || "");
-                    runCode();
-                    autosaveCode();
-                     Swal.fire(
-                        'Berhasil!',
-                        'Project telah dimuat.',
-                        'success'
-                    );
-                } catch (err) {
-                    Swal.fire(
-                        'Error!',
-                        'Gagal memuat project: ' + err,
-                        'error'
-                    );
-                    logConsole("Gagal memuat project: " + err, 'error');
-                }
-            }
-            reader.readAsText(file);
-        }
+        <button class="nav-link" id="js-tab" data-bs-toggle="tab" data-bs-target="#js" type="button" role="tab" aria-controls="js" aria-selected="false">JavaScript</button>
 
-        // Ubah tema CodeMirror
-        function changeTheme(theme) {
-            htmlEditor.setOption("theme", theme);
-            cssEditor.setOption("theme", theme);
-            jsEditor.setOption("theme", theme);
-        }
+      </li>
 
-        // Fungsi untuk memuat file tools dari URL ke editor HTML
-        function loadTools() {
-            const url = "https://raw.githubusercontent.com/wawanseptiana19/Tools/refs/heads/main/Menyembunyikan%20dan%20Memunculkan%20File%20Media%20Video%2C%20Audio%2C%20Gambar.txt";
-            showLoading();
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) throw new Error("Gagal mengambil file.");
-                    return response.text();
-                })
-                .then(text => {
-                    htmlEditor.setValue(text);
-                    runCode();
-                    logConsole("Kode tools berhasil dimuat ke editor HTML.");
-                })
-                .catch(err => {
-                    logConsole("Error: " + err.message, 'error');
-                })
-                .finally(() => {
-                    hideLoading();
-                });
-        }
+    </ul>
 
-        // Mendeteksi perintah di input console
-        document.getElementById("consoleInput").addEventListener("keydown", function(e) {
-            if (e.key === "Enter") {
-                const command = e.target.value.trim();
-                if (command === "--e1") {
-                    logConsole("Perintah '--e1' terdeteksi. Memuat tools...");
-                    loadTools(); // Langsung panggil fungsi loadTools tanpa menampilkan tombol
-                } else {
-                    logConsole("Perintah tidak dikenal: " + command, 'warning');
-                }
-                e.target.value = "";
-            }
-        });
+    <div class="tab-content" id="editorTabContent">
 
-        // Fungsi untuk membuka preview di tab baru
-        function openInNewTab() {
-          var content = document.getElementById("preview").srcdoc;
-          if (!content) {
-            Swal.fire({
-                title: 'Tidak Ada Kode!',
-                text: "Jalankan kode terlebih dahulu sebelum membuka di tab baru.",
-                icon: 'warning',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'OK'
-            });
-            return;
-          }
-          var newTab = window.open();
-          newTab.document.write(content);
-          newTab.document.close();
-        }
+      <div class="tab-pane fade show active" id="html" role="tabpanel" aria-labelledby="html-tab">
 
-        // Muat autosave saat halaman dimuat
-        window.addEventListener("load", loadAutosave);
+        <textarea id="htmlEditor"></textarea>
 
-        // Fungsi untuk menampilkan loading indicator
-        function showLoading() {
-            document.getElementById("loadingIndicator").style.display = "block";
-        }
+      </div>
 
-        // Fungsi untuk menyembunyikan loading indicator
-        function hideLoading() {
-            document.getElementById("loadingIndicator").style.display = "none";
-        }
+      <div class="tab-pane fade" id="css" role="tabpanel" aria-labelledby="css-tab">
 
-        // Fungsi untuk menambahkan library eksternal
-        function addLibrary() {
-            const libraryUrl = document.getElementById("librarySelect").value;
-            if (!libraryUrl) {
-                Swal.fire({
-                    title: 'Pilih Library!',
-                    text: "Pilih library yang ingin Anda tambahkan.",
-                    icon: 'warning',
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'OK'
-                });
-                return;
-            }
+        <textarea id="cssEditor"></textarea>
 
-            showLoading();
-            // Cek apakah library sudah ditambahkan sebelumnya
-            const libraryList = document.getElementById("libraryList");
-            const libraryItems = libraryList.getElementsByTagName("li");
-            for (let i = 0; i < libraryItems.length; i++) {
-                if (libraryItems[i].getAttribute("data-url") === libraryUrl) {
-                    Swal.fire({
-                        title: 'Library Sudah Ada!',
-                        text: "Library ini sudah ditambahkan sebelumnya.",
-                        icon: 'info',
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    });
-                    hideLoading();
-                    return; // Stop jika sudah ada
-                }
-            }
+      </div>
 
-            // Buat elemen script untuk menambahkan library
-            const script = document.createElement("script");
-            script.src = libraryUrl;
-            script.onload = function() {
-                logConsole(`Library ${libraryUrl} berhasil dimuat.`, 'success');
-                runCode(); // Jalankan kode setelah library dimuat
-                hideLoading();
-                 Swal.fire(
-                        'Berhasil!',
-                        'Library telah ditambahkan.',
-                        'success'
-                    );
-            };
-            script.onerror = function() {
-                logConsole(`Gagal memuat library ${libraryUrl}.`, 'error');
-                hideLoading();
-                Swal.fire(
-                        'Gagal!',
-                        'Gagal menambahkan Library.',
-                        'error'
-                    );
-            };
-            document.head.appendChild(script);
+      <div class="tab-pane fade" id="js" role="tabpanel" aria-labelledby="js-tab">
 
-            // Tambahkan library ke daftar loaded
-            const li = document.createElement("li");
-            li.textContent = new URL(libraryUrl).pathname.split('/').pop();
-            li.setAttribute("data-url", libraryUrl); // Simpan URL untuk pengecekan duplikat
-            libraryList.appendChild(li);
-            // Reset select setelah menambahkan
-            document.getElementById("librarySelect").value = "";
-        }
+        <textarea id="jsEditor"></textarea>
 
-        // Fungsi Kolaborasi
-        let socket;
-        let roomId;
+      </div>
 
-        function startCollaboration() {
-            if (socket) {
-                // Jika sudah terhubung, disconnect
-                socket.disconnect();
-                socket = null;
-                roomId = null;
-                document.getElementById("collaborateBtn").textContent = "Mulai Kolaborasi";
-                document.getElementById("collaborateBtn").classList.remove("btn-danger");
-                document.getElementById("collaborateBtn").classList.add("btn-success");
-                logConsole("Koneksi kolaborasi terputus.");
-                return;
-            }
+    </div>
 
-            Swal.fire({
-                title: 'Mulai Kolaborasi',
-                text: 'Masukkan Room ID atau biarkan otomatis:',
-                input: 'text',
-                inputPlaceholder: 'Opsional',
-                showCancelButton: true,
-                confirmButtonText: 'Mulai',
-                cancelButtonText: 'Batal',
-                showLoaderOnConfirm: true,
-                preConfirm: (inputRoomId) => {
-                    roomId = inputRoomId;
-                    return new Promise((resolve) => {
-                        // Inisialisasi Socket.IO
-                        socket = io("https://real-time-html-editor.glitch.me"); // Ganti dengan server Anda
-                        socket.on('connect', () => {
-                            if (roomId) {
-                                socket.emit('joinRoom', roomId);
-                            } else {
-                                socket.emit('createRoom');
-                            }
-                            resolve(); // Resolve setelah connect
-                        });
 
-                        socket.on('connect_error', (error) => {
-                            reject(new Error('Failed to connect: ' + error.message)); // Reject pada error
-                        });
-                    });
-                },
-                allowOutsideClick: () => !Swal.isLoading()
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Setelah koneksi berhasil dan room didapat
-                    socket.on('roomCreated', (newRoomId) => {
-                        roomId = newRoomId;
-                        logConsole(`Berhasil membuat/bergabung ke room: ${roomId}`);
-                        document.getElementById("collaborateBtn").textContent = "Stop Kolaborasi";
-                        document.getElementById("collaborateBtn").classList.remove("btn-success");
-                        document.getElementById("collaborateBtn").classList.add("btn-danger");
-                         Swal.fire(
-                            'Berhasil!',
-                            `Anda terhubung ke Room ID: ${roomId}.  Bagikan ID ini untuk berkolaborasi.`,
-                            'success'
-                        );
-                    });
 
-                    socket.on('joinedRoom', (joinedRoomId) => {
-                        roomId = joinedRoomId;
-                        logConsole(`Berhasil bergabung ke room: ${roomId}`);
-                        document.getElementById("collaborateBtn").textContent = "Stop Kolaborasi";
-                        document.getElementById("collaborateBtn").classList.remove("btn-success");
-                        document.getElementById("collaborateBtn").classList.add("btn-danger");
-                         Swal.fire(
-                            'Bergabung!',
-                            `Anda bergabung ke Room ID: ${roomId}. Mulai berkolaborasi.`,
-                            'success'
-                        );
-                    });
+    <!-- Tombol Aksi -->
 
-                    socket.on('codeUpdate', (data) => {
-                        if (data.roomId === roomId) {
-                            htmlEditor.setValue(data.html);
-                            cssEditor.setValue(data.css);
-                            jsEditor.setValue(data.js);
-                            // Tidak perlu runCode disini, biarkan user yang kontrol
-                            logConsole(`Menerima update dari rekan di room ${roomId}.`);
-                        }
-                    });
+    <div class="mt-3 d-flex flex-wrap gap-2">
 
-                    // Kirim perubahan kode
-                    htmlEditor.on('change', () => {
-                        if (socket && roomId) {
-                            socket.emit('codeChange', {
-                                roomId: roomId,
-                                html: htmlEditor.getValue(),
-                                css: cssEditor.getValue(),
-                                js: jsEditor.getValue()
-                            });
-                        }
-                    });
-                    cssEditor.on('change', () => {
-                        if (socket && roomId) {
-                            socket.emit('codeChange', {
-                                roomId: roomId,
-                                html: htmlEditor.getValue(),
-                                css: cssEditor.getValue(),
-                                js: jsEditor.getValue()
-                            });
-                        }
-                    });
-                    jsEditor.on('change', () => {
-                        if (socket && roomId) {
-                            socket.emit('codeChange', {
-                                roomId: roomId,
-                                html: htmlEditor.getValue(),
-                                css: cssEditor.getValue(),
-                                js: jsEditor.getValue()
-                            });
-                        }
-                    });
+      <button class="btn btn-primary flex-fill" onclick="runCode()">Jalankan Kode</button>
 
-                    socket.on('userJoined', (userCount) => {
-                        logConsole(`Ada ${userCount} user di room ini.`, 'info');
-                    });
+      <button class="btn btn-success flex-fill" onclick="downloadCode()">Download Kode</button>
 
-                    socket.on('userLeft', (userCount) => {
-                        logConsole(`Ada ${userCount} user di room ini.`, 'info');
-                    });
+      <button class="btn btn-info flex-fill" onclick="toggleFullScreen()">Full Screen Preview</button>
 
-                     socket.on('error', (error) => {
-                        Swal.fire(
-                            'Error!',
-                            error,
-                            'error'
-                        );
-                        logConsole(error, 'error');
-                        socket.disconnect();
-                        socket = null;
-                        roomId = null;
-                        document.getElementById("collaborateBtn").textContent = "Mulai Kolaborasi";
-                        document.getElementById("collaborateBtn").classList.remove("btn-danger");
-                        document.getElementById("collaborateBtn").classList.add("btn-success");
-                    });
+      <button class="btn btn-warning flex-fill" onclick="resetCode()">Reset Editor</button>
 
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    logConsole("Kolaborasi dibatalkan.");
-                }
-            });
-        }
-    </script>
+      <button class="btn btn-secondary flex-fill" onclick="clearAutosave()">Hapus Autosave</button>
+
+      <button class="btn btn-dark flex-fill" onclick="exportProject()">Ekspor Project</button>
+
+      <button class="btn btn-secondary flex-fill">
+
+        <label class="mb-0">Impor Project: 
+
+          <input type="file" id="importFile" accept=".json" onchange="importProject(event)" style="display:none;">
+
+          <span class="btn btn-sm btn-outline-light" onclick="document.getElementById('importFile').click()">Pilih File</span>
+
+        </label>
+
+      </button>
+
+      <div class="flex-fill">
+
+        <select id="themeSelector" class="form-select" onchange="changeTheme(this.value)">
+
+          <option value="material-darker">Material Darker</option>
+
+          <option value="eclipse">Eclipse</option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- Preview dan Console -->
+
+    <div class="mt-4 row">
+
+      <div class="col-md-8">
+
+        <h4>Preview</h4>
+
+        <iframe id="preview" title="Preview Output"></iframe>
+
+        <!-- Tombol Buka di Tab Baru -->
+
+        <button class="btn btn-primary mt-2" onclick="openInNewTab()">Buka di tab baru</button>
+
+      </div>
+
+      <div class="col-md-4">
+
+        <h4>Console</h4>
+
+        <div id="console"></div>
+
+        <!-- Input untuk mengetik perintah di console -->
+
+        <input type="text" id="consoleInput" class="form-control" placeholder="Ketik perintah di sini...">
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- Bootstrap JS & Dependencies -->
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- CodeMirror JS -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+
+  <!-- Mode HTML -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+
+  <!-- Mode CSS -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+
+  <!-- Mode JavaScript -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+
+  
+
+  <script>
+
+    // Inisialisasi CodeMirror dengan tema default dari selector
+
+    var htmlEditor = CodeMirror.fromTextArea(document.getElementById("htmlEditor"), {
+
+      mode: "text/html",
+
+      theme: "material-darker",
+
+      lineNumbers: true,
+
+      autoCloseTags: true
+
+    });
+
+    var cssEditor = CodeMirror.fromTextArea(document.getElementById("cssEditor"), {
+
+      mode: "css",
+
+      theme: "material-darker",
+
+      lineNumbers: true,
+
+      autoCloseBrackets: true
+
+    });
+
+    var jsEditor = CodeMirror.fromTextArea(document.getElementById("jsEditor"), {
+
+      mode: "javascript",
+
+      theme: "material-darker",
+
+      lineNumbers: true,
+
+      autoCloseBrackets: true
+
+    });
+
+    
+
+    // Fungsi debounce untuk auto-run
+
+    function debounce(func, delay) {
+
+      let timer;
+
+      return function() {
+
+        clearTimeout(timer);
+
+        timer = setTimeout(() => func.apply(this, arguments), delay);
+
+      }
+
+    }
+
+    
+
+    // Menampilkan pesan di console panel
+
+    function logConsole(message) {
+
+      const consoleDiv = document.getElementById("console");
+
+      const p = document.createElement("p");
+
+      p.textContent = message;
+
+      consoleDiv.appendChild(p);
+
+      consoleDiv.scrollTop = consoleDiv.scrollHeight;
+
+    }
+
+    
+
+    // Fungsi untuk menjalankan kode pada iframe preview dan menyertakan error handling
+
+    function runCode() {
+
+      var htmlContent = htmlEditor.getValue();
+
+      var cssContent = "<style>" + cssEditor.getValue() + "</style>";
+
+      var jsContent = "<script>" +
+
+        // Menangkap error dan mengirimkan pesan ke parent
+
+        "window.onerror = function(msg, url, line, col, error) {" +
+
+          "parent.postMessage({type: 'console', message: msg + ' (line: ' + line + ')' }, '*');" +
+
+        "};" +
+
+        jsEditor.getValue() +
+
+      "<\/script>";
+
+      
+
+      var combinedCode = htmlContent + cssContent + jsContent;
+
+      document.getElementById("preview").srcdoc = combinedCode;
+
+      autosaveCode();
+
+      // Bersihkan console setiap kali run
+
+      document.getElementById("console").innerHTML = "";
+
+    }
+
+    
+
+    // Auto-run saat pengguna mengetik (debounced)
+
+    var debouncedRun = debounce(runCode, 500);
+
+    htmlEditor.on("change", debouncedRun);
+
+    cssEditor.on("change", debouncedRun);
+
+    jsEditor.on("change", debouncedRun);
+
+    
+
+    // Fungsi untuk mengunduh kode sebagai file HTML
+
+    function downloadCode() {
+
+      var htmlContent = htmlEditor.getValue();
+
+      var cssContent = "<style>" + cssEditor.getValue() + "</style>";
+
+      var jsContent = "<script>" + jsEditor.getValue() + "<\/script>";
+
+      var combinedCode = htmlContent + "\n" + cssContent + "\n" + jsContent;
+
+      var blob = new Blob([combinedCode], { type: 'text/html' });
+
+      var a = document.createElement('a');
+
+      a.href = URL.createObjectURL(blob);
+
+      a.download = 'kode.html';
+
+      document.body.appendChild(a);
+
+      a.click();
+
+      document.body.removeChild(a);
+
+    }
+
+    
+
+    // Fungsi untuk toggle full screen preview menggunakan Fullscreen API
+
+    function toggleFullScreen() {
+
+      var previewElement = document.getElementById("preview");
+
+      if (!document.fullscreenElement) {
+
+        previewElement.requestFullscreen().catch(err => {
+
+          alert("Error, tidak dapat masuk full screen: " + err.message);
+
+        });
+
+      } else {
+
+        document.exitFullscreen();
+
+      }
+
+    }
+
+    
+
+    // Fungsi untuk mereset editor dan preview
+
+    function resetCode() {
+
+      if(confirm("Apakah Anda yakin ingin mereset editor? Kode yang ada akan dihapus.")) {
+
+        htmlEditor.setValue("");
+
+        cssEditor.setValue("");
+
+        jsEditor.setValue("");
+
+        document.getElementById("preview").srcdoc = "";
+
+        document.getElementById("console").innerHTML = "";
+
+        autosaveCode(); // update localStorage
+
+      }
+
+    }
+
+    
+
+    // Autosave menggunakan localStorage
+
+    function autosaveCode() {
+
+      const codeData = {
+
+        html: htmlEditor.getValue(),
+
+        css: cssEditor.getValue(),
+
+        js: jsEditor.getValue()
+
+      };
+
+      localStorage.setItem("advancedHtmlRunnerCode", JSON.stringify(codeData));
+
+    }
+
+    
+
+    // Memuat kode dari localStorage
+
+    function loadAutosave() {
+
+      const saved = localStorage.getItem("advancedHtmlRunnerCode");
+
+      if (saved) {
+
+        try {
+
+          const codeData = JSON.parse(saved);
+
+          htmlEditor.setValue(codeData.html || "");
+
+          cssEditor.setValue(codeData.css || "");
+
+          jsEditor.setValue(codeData.js || "");
+
+          runCode();
+
+        } catch(e) {
+
+          console.error("Gagal memuat autosave:", e);
+
+        }
+
+      }
+
+    }
+
+    
+
+    // Hapus data autosave
+
+    function clearAutosave() {
+
+      if(confirm("Hapus data autosave?")) {
+
+        localStorage.removeItem("advancedHtmlRunnerCode");
+
+        alert("Autosave telah dihapus.");
+
+      }
+
+    }
+
+    
+
+    // Ekspor project sebagai file JSON
+
+    function exportProject() {
+
+      const projectData = {
+
+        html: htmlEditor.getValue(),
+
+        css: cssEditor.getValue(),
+
+        js: jsEditor.getValue()
+
+      };
+
+      const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
+
+      const a = document.createElement('a');
+
+      a.href = URL.createObjectURL(blob);
+
+      a.download = 'project.json';
+
+      document.body.appendChild(a);
+
+      a.click();
+
+      document.body.removeChild(a);
+
+    }
+
+    
+
+    // Impor project dari file JSON
+
+    function importProject(event) {
+
+      const file = event.target.files[0];
+
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+
+        try {
+
+          const projectData = JSON.parse(e.target.result);
+
+          htmlEditor.setValue(projectData.html || "");
+
+          cssEditor.setValue(projectData.css || "");
+
+          jsEditor.setValue(projectData.js || "");
+
+          runCode();
+
+          autosaveCode();
+
+          alert("Project berhasil dimuat!");
+
+        } catch (err) {
+
+          alert("Gagal memuat project: " + err);
+
+        }
+
+      }
+
+      reader.readAsText(file);
+
+    }
+
+    
+
+    // Ubah tema CodeMirror
+
+    function changeTheme(theme) {
+
+      htmlEditor.setOption("theme", theme);
+
+      cssEditor.setOption("theme", theme);
+
+      jsEditor.setOption("theme", theme);
+
+    }
+
+    
+
+    // Fungsi untuk memuat file tools dari URL ke editor HTML
+
+    function loadTools() {
+
+      const url = "https://raw.githubusercontent.com/wawanseptiana19/Tools/refs/heads/main/Menyembunyikan%20dan%20Memunculkan%20File%20Media%20Video%2C%20Audio%2C%20Gambar.txt";
+
+      fetch(url)
+
+        .then(response => {
+
+          if (!response.ok) throw new Error("Gagal mengambil file.");
+
+          return response.text();
+
+        })
+
+        .then(text => {
+
+          htmlEditor.setValue(text);
+
+          runCode();
+
+          logConsole("Kode tools berhasil dimuat ke editor HTML.");
+
+        })
+
+        .catch(err => {
+
+          logConsole("Error: " + err.message);
+
+        });
+
+    }
+
+    
+
+    // Mendeteksi perintah di input console
+
+    document.getElementById("consoleInput").addEventListener("keydown", function(e) {
+
+      if (e.key === "Enter") {
+
+        const command = e.target.value.trim();
+
+        if (command === "--e1") {
+
+          logConsole("Perintah '--e1' terdeteksi. Memuat tools...");
+
+          loadTools(); // Langsung panggil fungsi loadTools tanpa menampilkan tombol
+
+        } else {
+
+          logConsole("Perintah tidak dikenal: " + command);
+
+        }
+
+        e.target.value = "";
+
+      }
+
+    });
+
+    
+
+    // Fungsi untuk membuka preview di tab baru
+
+    function openInNewTab() {
+
+      var content = document.getElementById("preview").srcdoc;
+
+      var newTab = window.open();
+
+      newTab.document.write(content);
+
+      newTab.document.close();
+
+    }
+
+    
+
+    // Muat autosave saat halaman dimuat
+
+    window.addEventListener("load", loadAutosave);
+
+  </script>
+
 </body>
+
 </html>
