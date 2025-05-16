@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Advanced HTML Runner - Super Canggih</title>
+    <title>Advanced HTML Runner</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-darker.min.css">
@@ -26,7 +26,7 @@
             border-radius: 0.25rem;
             width: 100%;
             height: 400px;
-            background-color: white; /* Set background color for the preview iframe */
+            background-color: white;
         }
         #console {
             background-color: #1e1e1e;
@@ -37,6 +37,8 @@
             border-radius: 0.25rem;
             font-family: monospace;
             margin-bottom: 10px;
+            display: flex; /* Tambahkan flexbox */
+            flex-direction: column; /* Atur arah flex ke kolom */
         }
         #consoleInput {
             margin-top: 5px;
@@ -71,6 +73,33 @@
             flex-grow: 1;
             overflow: auto;
         }
+
+        /* Gaya untuk input di dalam konsol */
+        #consoleInput {
+            background-color: #1e1e1e; /* Sama dengan background konsol */
+            color: #f1f1f1; /* Sama dengan warna teks konsol */
+            border: none; /* Hilangkan border */
+            padding: 0; /* Reset padding */
+            margin: 0; /* Reset margin */
+            font-family: monospace; /* Font monospace */
+            font-size: 1rem; /* Ukuran font yang sesuai */
+            outline: none; /* Hilangkan outline saat fokus */
+            flex-grow: 1; /* Biar input mengisi sisa lebar */
+            min-height: 1.5rem;  /* Ensure input has some minimal height */
+        }
+
+        #consoleWrapper {
+            display: flex;  /* Use flexbox to align input and prompt */
+            align-items: center; /* Vertically center items */
+            gap: 0.5rem; /* Add some gap between prompt and input */
+            margin-top: 0.5rem;
+        }
+
+        .console-prompt {
+            color: #67e8f9; /* Warna prompt, misalnya cyan */
+            font-family: monospace;
+        }
+
     </style>
 </head>
 <body>
@@ -166,7 +195,6 @@
                     <span class="btn btn-sm btn-outline-light" onclick="document.getElementById('importFile').click()">Pilih File</span>
                 </label>
             </button>
-            <button id="loadToolsButton" class="btn btn-danger flex-fill" onclick="loadTools()">Load Tools</button>
         </div>
 
         <div class="mt-4 row">
@@ -177,8 +205,12 @@
             </div>
             <div class="col-md-4">
                 <h4>Console</h4>
-                <div id="console"></div>
-                <input type="text" id="consoleInput" class="form-control" placeholder="Ketik perintah di sini...">
+                <div id="console">
+                    <div id="consoleWrapper">
+                        <span class="console-prompt">&gt;</span>
+                        <input type="text" id="consoleInput" placeholder="Ketik perintah di sini...">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -202,7 +234,67 @@
             lineNumbers: true,
             autoCloseTags: true,
             indentUnit: 2,
-            tabSize: 2
+            tabSize: 2,
+            // Tambahkan CodeMirror style untuk pewarnaan HTML mirip VSCode
+            defineMode: "htmlmixed",
+            matchClosingTags: true,
+            mode: {
+                name: "htmlmixed",
+                tags: {
+                    style: [["color", "#f1f1f1"]], // Warna untuk tag <style>
+                    script: [["color", "#f1f1f1"]] // Warna untuk tag <script>
+                },
+                tagColors: {
+                    "div": "#e67e22", // Contoh warna untuk tag <div>
+                    "span": "#e67e22",
+                    "h1": "#c0392b", // Contoh warna untuk tag <h1>
+                    "h2": "#c0392b",
+                    "h3": "#c0392b",
+                    "h4": "#c0392b",
+                    "h5": "#c0392b",
+                    "h6": "#c0392b",
+                    "a": "#3498db", // Warna untuk link
+                    "p": "#f1f1f1",
+                    "ul": "#f1f1f1",
+                    "ol": "#f1f1f1",
+                    "li": "#f1f1f1",
+                    "table": "#f1f1f1",
+                    "tr": "#f1f1f1",
+                    "td": "#f1f1f1",
+                    "th": "#f1f1f1",
+                    "form": "#f1f1f1",
+                    "input": "#f1f1f1",
+                    "button": "#f1f1f1",
+                    "select": "#f1f1f1",
+                    "textarea": "#f1f1f1",
+                    "img": "#f1f1f1",
+                    "video": "#f1f1f1",
+                    "audio": "#f1f1f1",
+                    "canvas": "#f1f1f1",
+                    "svg": "#f1f1f1",
+                    "section": "#f1f1f1",
+                    "article": "#f1f1f1",
+                    "nav": "#f1f1f1",
+                    "header": "#f1f1f1",
+                    "footer": "#f1f1f1",
+                    "aside": "#f1f1f1",
+                    "main": "#f1f1f1",
+                    "address": "#f1f1f1"
+                },
+                attrColors: {
+                    "class": "#82b1ff", // Warna untuk atribut class
+                    "id": "#82b1ff",    // Warna untuk atribut id
+                    "style": "#82b1ff", // Warna untuk atribut style
+                    "href": "#82b1ff",
+                    "src": "#82b1ff",
+                    "alt": "#82b1ff",
+                    "title": "#82b1ff",
+                    "width": "#82b1ff",
+                    "height": "#82b1ff",
+                    "data-*": "#82b1ff",  // Warna untuk data-* attributes
+                    "aria-*": "#82b1ff"
+                }
+            }
         });
         var cssEditor = CodeMirror.fromTextArea(document.getElementById("cssEditor"), {
             mode: "css",
@@ -246,8 +338,8 @@
                 default:
                     p.style.color = '#f1f1f1';
             }
-            consoleDiv.appendChild(p);
-            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            consoleDiv.insertBefore(p, consoleDiv.firstChild); // Tambahkan di atas
+            consoleDiv.scrollTop = 0; // Gulir ke atas
         }
 
         // Fungsi untuk menjalankan kode pada iframe preview dan menyertakan error handling
@@ -268,7 +360,7 @@
             document.getElementById("preview").srcdoc = combinedCode;
             autosaveCode();
             // Bersihkan console setiap kali run
-            document.getElementById("console").innerHTML = "";
+            document.getElementById("console").innerHTML = '<div id="consoleWrapper"><span class="console-prompt">&gt;</span><input type="text" id="consoleInput" placeholder="Ketik perintah di sini..."></div>';
             setTimeout(hideLoading, 300); // Simulate network delay
         }
 
@@ -323,7 +415,7 @@
                     cssEditor.setValue("");
                     jsEditor.setValue("");
                     document.getElementById("preview").srcdoc = "";
-                    document.getElementById("console").innerHTML = "";
+                    document.getElementById("console").innerHTML = '<div id="consoleWrapper"><span class="console-prompt">&gt;</span><input type="text" id="consoleInput" placeholder="Ketik perintah di sini..."></div>';
                     autosaveCode(); // update localStorage
                     Swal.fire(
                         'Berhasil!',
@@ -434,9 +526,7 @@
             cssEditor.setOption("theme", theme);
             jsEditor.setOption("theme", theme);
             localStorage.setItem('editorTheme', theme);
-        }
-
-        // Ubah ukuran font editor
+        }// Ubah ukuran font editor
         function changeFontSize(size) {
             htmlEditor.getWrapperElement().style.fontSize = size + 'px';
             cssEditor.getWrapperElement().style.fontSize = size + 'px';
@@ -478,7 +568,7 @@
                 // Jika menggunakan module bundler, import CSS di sini.
                 logConsole('Bootstrap dipilih. Pastikan sudah ditambahkan ke HTML.', 'info');
             } else if (framework === 'tailwind') {
-                 logConsole('Tailwind CSS dipilih. Pastikan sudah ditambahkan ke HTML.', 'info');
+                logConsole('Tailwind CSS dipilih. Pastikan sudah ditambahkan ke HTML.', 'info');
             } else if (framework === 'bulma') {
                 logConsole('Bulma CSS dipilih. Pastikan sudah ditambahkan ke HTML.', 'info');
             }
@@ -644,10 +734,35 @@
         document.getElementById("consoleInput").addEventListener("keydown", function(e) {
             if (e.key === "Enter") {
                 const command = e.target.value.trim();
-                if (command === "--e1") {
+                if (command === "open TingkatkanGambar") {
+                    logConsole("Perintah 'open TingkatkanGambar' terdeteksi. Memuat file...", 'info');
+                    // Panggil fungsi loadTools atau modifikasi sesuai kebutuhan
+                    const url = "https://raw.githubusercontent.com/wawanseptiana19/asmdatabase/refs/heads/main/TingkatkanGambar.html";
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) throw new Error("Gagal mengambil file.");
+                            return response.text();
+                        })
+                        .then(text => {
+                            htmlEditor.setValue(text); // Set konten ke editor HTML
+                            runCode(); // Jalankan kode yang baru dimuat
+                            logConsole("File TingkatkanGambar.html berhasil dimuat ke editor HTML.", 'success');
+                        })
+                        .catch(err => {
+                            logConsole("Error: " + err.message, 'error');
+                            Swal.fire({
+                                title: 'Gagal Memuat File',
+                                text: 'Terjadi kesalahan saat memuat file: ' + err.message,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+
+                } else if (command === "--e1") {
                     logConsole("Perintah '--e1' terdeteksi. Memuat tools...", 'info');
                     loadTools(); // Langsung panggil fungsi loadTools
-                } else {
+                }
+                else {
                     logConsole("Perintah tidak dikenal: " + command, 'warning');
                 }
                 e.target.value = "";
@@ -682,6 +797,8 @@
                 document.getElementById('pusherCluster').value = pusherCluster;
                 initPusher(pusherAppId, pusherKey, pusherCluster);
             }
+            // Pindahkan fokus ke input konsol saat halaman load
+            document.getElementById('consoleInput').focus();
         });
     </script>
 </body>
