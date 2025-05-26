@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern Cipher Toolbox</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap"
+        rel="stylesheet"
+    />
+    <style>
+        /* Definisi variabel warna untuk konsistensi tema (Light Theme Default) */
+        :root {
+            --primary: #6366f1; /* Biru keunguan */
+            --primary-hover: #4f46e5; /* Biru keunguan lebih gelap saat hover */
+            --secondary: #10b981; /* Hijau teal */
+            --secondary-hover: #059669; /* Hijau teal lebih gelap saat hover */
+            --background: #f0f4f8; /* Latar belakang abu-abu terang */
+            --surface: #ffffff; /* Warna permukaan kartu/elemen putih */
+            --text: #1a202c; /* Warna teks gelap */
+            --muted: #6b7280; /* Warna teks abu-abu untuk label/deskripsi */
+            --border-color: #e2e8f0; /* Warna batas elemen */
+            --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.04); /* Bayangan ringan */
+            --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.08); /* Bayangan sedang */
+        }
+
+        /* Tema Gelap Otomatis */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background: #1a202c; /* Latar belakang gelap */
+                --surface: #2d3748; /* Warna permukaan elemen lebih gelap */
+                --text: #e2e8f0; /* Warna teks terang */
+                --muted: #a0aec0; /* Warna teks abu-abu terang */
+                --border-color: #4a5568; /* Batas elemen lebih gelap */
+                --shadow-light: none; /* Nonaktifkan bayangan di tema gelap */
+                --shadow-medium: none; /* Nonaktifkan bayangan di tema gelap */
+            }
+        }
+
+        /* Gaya dasar untuk body */
+        body {
+            background: var(--background);
+            min-height: 100vh;
+            padding: 2rem; /* Padding seragam di sekitar konten */
+            font-family: 'Inter', system-ui, sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            box-sizing: border-box; /* Memastikan padding tidak menambah lebar total */
+        }
+
+        /* Container utama aplikasi cipher */
+        .cipher-container {
+            width: 100%;
+            max-width: 800px; /* Konten tetap dalam lebar yang mudah dibaca */
+            margin: 0 auto; /* Pusatkan container */
+            padding: 2.5rem; /* Padding internal untuk konten */
+            background: var(--surface); /* Latar belakang elemen utama */
+            border-radius: 1.5rem; /* Sudut membulat */
+            box-shadow: var(--shadow-medium); /* Bayangan untuk menonjolkan elemen */
+            border: 1px solid var(--border-color); /* Batas elemen */
+            box-sizing: border-box;
+        }
+
+        /* Judul aplikasi */
+        .cipher-title {
+            margin: 0 0 2rem 0;
+            font-size: 2.25rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--primary);
+            letter-spacing: -0.03em;
+        }
+
+        /* Grup input umum */
+        .input-group {
+            margin-bottom: 1.75rem;
+        }
+
+        /* Label input */
+        .input-label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        /* Gaya untuk input teks dan textarea */
+        .cipher-input,
+        .cipher-select {
+            width: 100%; /* Lebar penuh */
+            padding: 0.9rem 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            background: var(--surface);
+            font-size: 1rem;
+            transition: all 0.25s ease;
+            color: var(--text);
+            box-sizing: border-box;
+        }
+
+        /* Placeholder untuk input */
+        .cipher-input::placeholder {
+            color: #94a3b8;
+            opacity: 0.8;
+        }
+
+        /* Efek fokus pada input */
+        .cipher-input:focus,
+        .cipher-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Styling untuk container metode cipher (checkbox) */
+        .cipher-methods-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            background: var(--surface);
+            box-shadow: var(--shadow-light);
+        }
+
+        /* Gaya untuk setiap item metode cipher (label checkbox) */
+        .cipher-method-item {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            padding: 0.6rem 1rem;
+            border-radius: 0.6rem;
+            background-color: var(--background); /* Menggunakan warna background untuk item */
+            transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--border-color);
+            position: relative; /* Untuk posisi tooltip */
+        }
+
+        /* Efek hover pada item metode cipher */
+        .cipher-method-item:hover {
+            background-color: var(--border-color); /* Sedikit lebih gelap/terang saat hover */
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Gaya untuk checkbox itu sendiri */
+        .cipher-method-item input[type="checkbox"] {
+            margin-right: 0.6rem;
+            accent-color: var(--primary);
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+        }
+
+        /* Gaya teks saat checkbox dicentang */
+        .cipher-method-item input[type="checkbox"]:checked + span {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Info icon for method description */
+        .info-icon {
+            margin-left: 0.5rem;
+            cursor: help;
+            color: var(--muted);
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+
+        .info-icon:hover {
+            color: var(--primary);
+        }
+
+        /* Tooltip for method description */
+        .method-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            background-color: var(--surface);
+            color: var(--text);
+            text-align: left;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above the icon */
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-color);
+            width: 250px; /* Lebar tetap untuk tooltip */
+            font-size: 0.85rem;
+            line-height: 1.4;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .method-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%; /* At the bottom of the tooltip */
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--surface) transparent transparent transparent;
+        }
+
+        .cipher-method-item:hover .method-tooltip,
+        .cipher-method-item .info-icon:focus + .method-tooltip { /* Show tooltip on hover or focus on info icon */
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* File Input Wrapper */
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            width: 88px;
+            height: 88px;
+        }
+        
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        /* Tombol download */
+        .download-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-light);
+        }
+        
+        .download-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .download-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        
+        .download-group {
+            margin-top: 2rem;
+        }
+
+        /* Grup horizontal untuk input teks dan tombol upload */
+        .horizontal-group {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        /* Container untuk input teks agar bisa fleksibel */
+        .text-input-container {
+            flex: 1;
+        }
+
+        /* Container untuk tombol upload */
+        .file-upload-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        /* Perubahan desain tombol upload */
+        .file-upload-btn {
+            padding: 0.5rem;
+            width: 88px;
+            height: 88px;
+            border-radius: 0.75rem;
+            background-color: var(--background); /* Menggunakan warna background untuk tombol */
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: var(--shadow-light);
+            color: var(--text); /* Warna ikon */
+        }
+
+        .file-upload-btn:hover {
+            background-color: var(--border-color); /* Sedikit lebih gelap/terang saat hover */
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Responsive design for small screens */
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+            .cipher-container {
+                padding: 1.5rem;
+                border-radius: 1rem;
+            }
+            
+            .cipher-title {
+                font-size: 1.8rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .horizontal-group {
+                flex-direction: column;
+                gap: 1.25rem;
+            }
+
+            .cipher-input,
+            .cipher-select {
+                width: 100%;
+                padding: 0.8rem 1rem;
+            }
+
+            .file-upload-container {
+                width: 100%;
+                align-items: flex-start;
+            }
+
+            .file-input-wrapper {
+                width: 100%;
+                height: auto;
+            }
+
+            .file-upload-btn {
+                width: 100%;
+                height: 50px;
+                border-radius: 0.75rem;
+                flex-direction: row;
+                gap: 0.5rem;
+            }
+            .file-upload-btn svg {
+                margin-right: 0.5rem;
+            }
+
+            .method-tooltip {
+                width: 90%; /* Adjust width for small screens */
+                left: 5%;
+                transform: translateX(0);
+            }
+        }
+
+        /* Animasi fade-in untuk hasil */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* Styling for selected ciphers order display */
+        #selected-ciphers-order {
+            background-color: var(--background);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-top: -0.75rem; /* Adjust spacing */
+            box-shadow: var(--shadow-light);
+        }
+
+        #selected-ciphers-order strong {
+            color: var(--text);
+        }
+
+        #selected-ciphers-order ol {
+            margin: 0.5rem 0 0 1.2rem;
+            padding: 0;
+            list-style-type: decimal;
+        }
+
+        #selected-ciphers-order li {
+            margin-bottom: 0.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="cipher-container">
+        <h2 class="cipher-title">Cipher Toolbox</h2>
+        
+        <div class="input-group">
+            <label class="input-label">Select Cipher Method(s)</label>
+            <div class="cipher-methods-container" id="cipher-methods-container">
+                <label class="cipher-method-item">
+                    <input type="checkbox" name="cipher-method" value="xor">
+                    <span>XOR Cipher</span>
+                    <span class="info-icon" data-method="xor">ℹ️</span>
+                    <div class="method-tooltip" id="tooltip-xor"></div>
+                </label>
+                <label class="cipher-method-item">
+                    <input type="checkbox" name="cipher-method" value="reverse">
+                    <span>Reverse Alphabet</span>
+                    <span class="info-icon" data-method="reverse">ℹ️</span>
+                    <div class="method-tooltip" id="tooltip-reverse"></div>
+                </label>
+                <label class="cipher-method-item">
+                    <input type="checkbox" name="cipher-method" value="caesar">
+                    <span>Caesar Cipher</span>
+                    <span class="info-icon" data-method="caesar">ℹ️</span>
+                    <div class="method-tooltip" id="tooltip-caesar"></div>
+                </label>
+                <label class="cipher-method-item">
+                    <input type="checkbox" name="cipher-method" value="vigenere">
+                    <span>Vigenère Cipher</span>
+                    <span class="info-icon" data-method="vigenere">ℹ️</span>
+                    <div class="method-tooltip" id="tooltip-vigenere"></div>
+                </label>
+                <label class="cipher-method-item">
+                    <input type="checkbox" name="cipher-method" value="hex">
+                    <span>Hex Encoding</span>
+                    <span class="info-icon" data-method="hex">ℹ️</span>
+                    <div class="method-tooltip" id="tooltip-hex"></div>
+                </label>
+                <label class="cipher-method-item">
+                    <input type="checkbox" name="cipher-method" value="octal">
+                    <span>Octal Encoding</span>
+                    <span class="info-icon" data-method="octal">ℹ️</span>
+                    <div class="method-tooltip" id="tooltip-octal"></div>
+                </label>
+                <label class="cipher-method-item">
+                    <input type="checkbox" name="cipher-method" value="atbash">
+                    <span>Atbash Cipher</span>
+                    <span class="info-icon" data-method="atbash">ℹ️</span>
+                    <div class="method-tooltip" id="tooltip-atbash"></div>
+                </label>
+                <label class="cipher-method-item">
+                    <input type="checkbox" name="cipher-method" value="rot13">
+                    <span>ROT13 Cipher</span>
+                    <span class="info-icon" data-method="rot13">ℹ️</span>
+                    <div class="method-tooltip" id="tooltip-rot13"></div>
+                </label>
+            </div>
+        </div>
+
+        <div id="selected-ciphers-order" class="input-group">
+            <strong>Selected Cipher Order:</strong>
+            <ol id="order-list"></ol>
+        </div>
+
+        <div class="input-group horizontal-group">
+            <div class="text-input-container">
+                <label class="input-label">Input Text</label>
+                <textarea class="cipher-input" id="cipher-text" rows="3" placeholder="Enter your text here..."></textarea>
+            </div>
+            <div class="file-upload-container">
+                <label class="input-label">Upload TXT</label>
+                <div class="file-input-wrapper">
+                    <button class="cipher-btn file-upload-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        <span class="upload-text">Upload</span>
+                    </button>
+                    <input type="file" class="file-input" id="file-input" accept=".txt">
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group" id="key-container">
+            <label class="input-label">Encryption Key (Applies to all selected ciphers requiring a key)</label>
+            <input class="cipher-input" id="cipher-key" type="text" placeholder="Enter your key...">
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Mode</label>
+            <select class="cipher-select" id="cipher-mode">
+                <option value="encrypt">Encrypt/Encode</option>
+                <option value="decrypt">Decrypt/Decode</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label">Result</label>
+            <textarea class="cipher-input" id="cipher-result" rows="3" placeholder="Your result will appear here..." readonly></textarea>
+        </div>
+
+        <div class="download-group">
+            <button class="download-btn" id="download-btn" disabled>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Download Result
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Objek yang berisi deskripsi untuk setiap metode cipher
+        const methodDescriptions = {
+            xor: "XOR Cipher: Menggunakan operator bitwise XOR antara byte teks dan byte kunci. Setiap byte dari teks di-XOR dengan byte dari kunci secara berulang (jika kunci lebih pendek dari teks) menghasilkan output dalam format hexadecimal. Metode ini sederhana namun tidak cocok untuk keamanan tingkat tinggi.",
+            reverse: "Reverse Alphabet: Metode ini membalikkan urutan huruf dalam alfabet (A menjadi Z, B menjadi Y, dst.). Hanya berlaku untuk huruf alfabet dan tidak mengubah karakter non-alfabet. Teknik ini lebih ke obfuscation daripada enkripsi yang aman.",
+            caesar: "Caesar Cipher: Teknik enkripsi substitusi dengan menggeser huruf-huruf dalam teks sebanyak nilai yang ditentukan. Contohnya, dengan geseran 3, 'A' menjadi 'D', 'B' menjadi 'E', dst. Pada dekripsi, proses penggeseran dibalik. Metode ini sederhana dan mudah ditebak jika kunci (nilai geser) diketahui.",
+            vigenere: "Vigenère Cipher: Menggunakan kata kunci untuk melakukan enkripsi substitusi secara bergantian. Setiap huruf dalam teks digeser berdasarkan huruf yang bersesuaian pada kunci, menciptakan pola yang lebih kompleks dibandingkan Caesar Cipher. Keamanannya bergantung pada panjang dan kompleksitas kunci yang digunakan.",
+            hex: "Hex Encoding: Mengkonversi setiap karakter teks menjadi representasi hexadecimal dari byte-nya. Proses ini lebih merupakan konversi data daripada enkripsi murni. Dekripsi dilakukan dengan mengubah kembali nilai hexadecimal ke teks asli.",
+            octal: "Octal Encoding: Mengkonversi teks menjadi representasi oktal dari setiap byte. Setiap byte ditampilkan sebagai tiga digit oktal. Mirip dengan Hex Encoding, metode ini lebih merupakan konversi data daripada enkripsi yang aman.",
+            atbash: "Atbash Cipher: Sebuah cipher substitusi yang membalikkan alfabet. Huruf pertama (A) menjadi huruf terakhir (Z), huruf kedua (B) menjadi huruf kedua terakhir (Y), dan seterusnya. Ini adalah cipher self-inverse, artinya enkripsi dan dekripsi menggunakan proses yang sama.",
+            rot13: "ROT13 Cipher: Sebuah kasus khusus dari Caesar Cipher di mana pergeseran adalah 13. Ini adalah cipher self-inverse, artinya enkripsi dan dekripsi menggunakan proses yang sama. Sering digunakan untuk menyembunyikan spoiler atau lelucon."
+        };
+
+        /**
+         * Mengatur visibilitas container kunci berdasarkan metode cipher yang dipilih.
+         */
+        function updateKeyContainerVisibility() {
+            const selectedMethodCheckboxes = document.querySelectorAll('#cipher-methods-container input[type="checkbox"]:checked');
+            const selectedMethods = Array.from(selectedMethodCheckboxes).map(checkbox => checkbox.value);
+            const keyContainer = document.getElementById('key-container');
+            const needsKey = selectedMethods.some(method => ['xor', 'caesar', 'vigenere'].includes(method));
+            
+            keyContainer.style.display = needsKey ? 'block' : 'none';
+        }
+
+        /**
+         * Memperbarui daftar urutan cipher yang dipilih.
+         */
+        function updateSelectedCiphersOrder() {
+            const selectedMethodCheckboxes = document.querySelectorAll('#cipher-methods-container input[type="checkbox"]:checked');
+            const orderList = document.getElementById('order-list');
+            orderList.innerHTML = ''; // Clear existing list
+
+            if (selectedMethodCheckboxes.length === 0) {
+                orderList.innerHTML = '<li>Tidak ada metode yang dipilih.</li>';
+            } else {
+                Array.from(selectedMethodCheckboxes).forEach(checkbox => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = checkbox.nextElementSibling.textContent; // Get the text from the span next to checkbox
+                    orderList.appendChild(listItem);
+                });
+            }
+        }
+
+        /**
+         * Mengatur proses enkripsi/dekripsi berdasarkan metode yang dipilih dan mode.
+         * @param {boolean} isEncrypt - True untuk enkripsi, false untuk dekripsi.
+         */
+        function processCipher(isEncrypt) {
+            const selectedMethodCheckboxes = document.querySelectorAll('#cipher-methods-container input[type="checkbox"]:checked');
+            const selectedMethods = Array.from(selectedMethodCheckboxes).map(checkbox => checkbox.value);
+            const text = document.getElementById('cipher-text').value;
+            const key = document.getElementById('cipher-key').value;
+            const resultElement = document.getElementById('cipher-result');
+
+            if (!text) {
+                resultElement.value = "";
+                document.getElementById('download-btn').disabled = true;
+                return;
+            }
+
+            let methodsToProcess = [...selectedMethods];
+            if (!isEncrypt) {
+                methodsToProcess.reverse(); // Untuk dekripsi, proses dalam urutan terbalik
+            }
+
+            let currentText = text;
+            let needsKey = false;
+
+            try {
+                for (const method of methodsToProcess) {
+                    if (['xor', 'caesar', 'vigenere'].includes(method)) {
+                        needsKey = true;
+                        if (!key) {
+                            resultElement.value = "";
+                            document.getElementById('download-btn').disabled = true;
+                            return;
+                        }
+                    }
+
+                    switch (method) {
+                        case 'xor':
+                            currentText = xorCipher(currentText, key, isEncrypt);
+                            break;
+                        case 'reverse':
+                            currentText = reverseAlphabet(currentText);
+                            break;
+                        case 'caesar':
+                            const shift = parseInt(key) || 3;
+                            currentText = caesarCipher(currentText, shift, isEncrypt);
+                            break;
+                        case 'hex':
+                            currentText = isEncrypt ? textToHex(currentText) : hexToText(currentText);
+                            break;
+                        case 'vigenere':
+                            currentText = vigenereCipher(currentText, key, isEncrypt);
+                            break;
+                        case 'octal':
+                            currentText = isEncrypt ? textToOctal(currentText) : octalToText(currentText);
+                            break;
+                        case 'atbash':
+                            currentText = atbashCipher(currentText);
+                            break;
+                        case 'rot13':
+                            currentText = rot13Cipher(currentText);
+                            break;
+                        default:
+                            console.warn(`Metode cipher tidak dikenal: ${method}`);
+                            break;
+                    }
+                }
+
+                resultElement.value = currentText;
+                resultElement.classList.remove('fade-in');
+                void resultElement.offsetWidth; 
+                resultElement.classList.add('fade-in');
+                document.getElementById('download-btn').disabled = false;
+            } catch (e) {
+                console.error("Kesalahan selama pemrosesan cipher:", e);
+                resultElement.value = "Error: Tidak dapat memproses teks. Periksa input atau kunci.";
+                document.getElementById('download-btn').disabled = true;
+            } finally {
+                updateKeyContainerVisibility(); // Pastikan visibilitas kunci diperbarui
+            }
+        }
+
+        // Fungsi untuk memperbarui cipher secara otomatis
+        function updateCipher() {
+            const mode = document.getElementById('cipher-mode').value;
+            const isEncrypt = mode === 'encrypt';
+            processCipher(isEncrypt);
+        }
+
+        // --- Fungsi Cipher ---
+
+        /**
+         * Melakukan enkripsi atau dekripsi XOR.
+         */
+        function xorCipher(input, key, encrypt) {
+            const encoder = new TextEncoder();
+            const decoder = new TextDecoder();
+            const keyBytes = encoder.encode(key);
+
+            if (encrypt) {
+                const inputBytes = encoder.encode(input);
+                const output = new Uint8Array(inputBytes.length);
+                for (let i = 0; i < inputBytes.length; i++) {
+                    output[i] = inputBytes[i] ^ keyBytes[i % keyBytes.length];
+                }
+                return Array.from(output)
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('');
+            } else {
+                if (!/^[0-9a-fA-F]*$/.test(input) || input.length % 2 !== 0) {
+                    throw new Error("String heksadesimal tidak valid untuk dekripsi XOR.");
+                }
+                const hexPairs = input.match(/[\da-f]{2}/gi) || [];
+                const bytes = new Uint8Array(hexPairs.map(h => parseInt(h, 16)));
+                const output = new Uint8Array(bytes.length);
+                for (let i = 0; i < bytes.length; i++) {
+                    output[i] = bytes[i] ^ keyBytes[i % keyBytes.length];
+                }
+                return decoder.decode(output);
+            }
+        }
+
+        /**
+         * Membalikkan alfabet untuk karakter alfabet.
+         */
+        function reverseAlphabet(text) {
+            return text
+                .split('')
+                .map(c => {
+                    const code = c.charCodeAt(0);
+                    if (code >= 65 && code <= 90) { // Uppercase A-Z
+                        return String.fromCharCode(155 - code);
+                    }
+                    if (code >= 97 && code <= 122) { // Lowercase a-z
+                        return String.fromCharCode(219 - code);
+                    }
+                    return c;
+                })
+                .join('');
+        }
+
+        /**
+         * Melakukan enkripsi atau dekripsi Caesar cipher.
+         */
+        function caesarCipher(text, shift, encrypt) {
+            if (!encrypt) shift = -shift;
+            return text
+                .split('')
+                .map(c => {
+                    let code = c.charCodeAt(0);
+                    if (code >= 65 && code <= 90) {
+                        code = ((code - 65 + shift) % 26 + 26) % 26 + 65;
+                    } else if (code >= 97 && code <= 122) {
+                        code = ((code - 97 + shift) % 26 + 26) % 26 + 97;
+                    }
+                    return String.fromCharCode(code);
+                })
+                .join('');
+        }
+
+        /**
+         * Mengkonversi teks ke representasi heksadesimalnya.
+         */
+        function textToHex(text) {
+            return Array.from(new TextEncoder().encode(text))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        /**
+         * Mengkonversi string heksadesimal kembali ke teks.
+         */
+        function hexToText(hex) {
+            if (!/^[0-9a-fA-F]*$/.test(hex) || hex.length % 2 !== 0) {
+                throw new Error("String heksadesimal tidak valid untuk dekode.");
+            }
+            const bytes = new Uint8Array(hex.match(/[\da-f]{2}/gi).map(h => parseInt(h, 16)));
+            return new TextDecoder().decode(bytes);
+        }
+
+        /**
+         * Melakukan enkripsi atau dekripsi Vigenère cipher.
+         */
+        function vigenereCipher(text, key, encrypt) {
+            let result = "";
+            let j = 0;
+            for (let i = 0; i < text.length; i++) {
+                const c = text[i];
+                if (c.match(/[a-zA-Z]/)) {
+                    const isUpperCase = c === c.toUpperCase();
+                    const base = isUpperCase ? 65 : 97;
+                    const textCharCode = c.charCodeAt(0) - base;
+
+                    const keyChar = key[j % key.length];
+                    if (!keyChar || !keyChar.match(/[a-zA-Z]/)) {
+                         result += c;
+                         continue;
+                    }
+                    const keyShift = keyChar.toLowerCase().charCodeAt(0) - 97;
+                    
+                    let newCode;
+                    if (encrypt) {
+                        newCode = (textCharCode + keyShift) % 26;
+                    } else {
+                        newCode = (textCharCode - keyShift + 26) % 26;
+                    }
+                    result += String.fromCharCode(newCode + base);
+                    j++;
+                } else {
+                    result += c;
+                }
+            }
+            return result;
+        }
+
+        /**
+         * Mengkonversi teks ke representasi oktalnya.
+         */
+        function textToOctal(text) {
+            return Array.from(new TextEncoder().encode(text))
+                .map(b => b.toString(8).padStart(3, '0'))
+                .join('');
+        }
+
+        /**
+         * Mengkonversi string oktal kembali ke teks.
+         */
+        function octalToText(octal) {
+            if (!/^[0-7]*(?:[0-7]{3})*$/.test(octal) || octal.length % 3 !== 0) {
+                throw new Error("String oktal tidak valid untuk dekode. Harus berupa kelompok 3 digit oktal.");
+            }
+            const matches = octal.match(/[0-7]{3}/g);
+            if (!matches) return "";
+            const bytes = new Uint8Array(matches.map(o => parseInt(o, 8)));
+            return new TextDecoder().decode(bytes);
+        }
+
+        /**
+         * Melakukan cipher Atbash.
+         */
+        function atbashCipher(text) {
+            return text
+                .split('')
+                .map(char => {
+                    const code = char.charCodeAt(0);
+                    if (code >= 65 && code <= 90) { // Uppercase A-Z
+                        return String.fromCharCode(90 - (code - 65));
+                    } else if (code >= 97 && code <= 122) { // Lowercase a-z
+                        return String.fromCharCode(122 - (code - 97));
+                    }
+                    return char; // Non-alphabetic characters remain unchanged
+                })
+                .join('');
+        }
+
+        /**
+         * Melakukan cipher ROT13 (Caesar cipher dengan shift 13).
+         */
+        function rot13Cipher(text) {
+            // ROT13 adalah Caesar cipher dengan shift 13, dan merupakan self-inverse
+            return caesarCipher(text, 13, true); // Enkripsi dan dekripsi sama
+        }
+
+        // --- Event Listeners ---
+
+        document.getElementById('cipher-text').addEventListener('input', updateCipher);
+        document.getElementById('cipher-key').addEventListener('input', updateCipher);
+        document.getElementById('cipher-mode').addEventListener('change', updateCipher);
+        
+        document.getElementById('cipher-methods-container').addEventListener('change', function (event) {
+            if (event.target.type === 'checkbox') {
+                updateKeyContainerVisibility();
+                updateSelectedCiphersOrder();
+                updateCipher();
+            }
+        });
+
+        // Event listener untuk menampilkan tooltip saat info icon di-hover
+        document.querySelectorAll('.info-icon').forEach(icon => {
+            const method = icon.dataset.method;
+            const tooltip = document.getElementById(`tooltip-${method}`);
+            if (tooltip) {
+                tooltip.textContent = methodDescriptions[method];
+            }
+        });
+
+        // File Upload Handler
+        document.getElementById('file-input').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file && file.type === "text/plain") {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('cipher-text').value = e.target.result;
+                    updateCipher();
+                };
+                reader.readAsText(file);
+            } else {
+                console.error('Hanya file TXT yang didukung.');
+            }
+        });
+
+        // File Download Handler
+        document.getElementById('download-btn').addEventListener('click', function () {
+            const result = document.getElementById('cipher-result').value;
+            if (result) {
+                const blob = new Blob([result], { type: 'text/plain' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cipher_result_${new Date().getTime()}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            }
+        });
+
+        document.getElementById('cipher-result').addEventListener('input', function () {
+            document.getElementById('download-btn').disabled = !this.value;
+        });
+
+        // Initial setup when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            updateKeyContainerVisibility();
+            updateSelectedCiphersOrder();
+            updateCipher();
+        });
+    </script>
+</body>
+</html>
