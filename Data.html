@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pamer Bakat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            background-color: #C0C0C0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        #passwordModal {
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(192, 192, 192, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(4px);
+        }
+
+        #passwordModal h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        #passwordFile {
+            display: none;
+        }
+
+        .custom-file-label {
+            padding: 0.75rem 1.5rem;
+            background-color: #DDD;
+            border: 2px solid #333;
+            border-radius: 0.5rem;
+            color: #333;
+            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-bottom: 1.5rem;
+            font-size: 0.8rem;
+        }
+
+        .custom-file-label:hover {
+            background-color: #CCC;
+            transform: scale(1.05);
+        }
+
+        #passwordModal button {
+            padding: 0.75rem 1.5rem;
+            background-color: #DDD;
+            border: 2px solid #333;
+            border-radius: 0.5rem;
+            color: #333;
+            cursor: pointer;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        #passwordModal button:hover {
+            background-color: #CCC;
+            transform: scale(1.05);
+        }
+
+        #passwordModal p {
+            color: #800000;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.8;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.8;
+            }
+        }
+
+        #mainContent {
+            display: none;
+            transition: margin-left 0.3s ease;
+        }
+
+        #sidebar {
+            height: 100%;
+            width: 90px;
+            position: fixed;
+            z-index: 1001;
+            top: 0;
+            left: -90px;
+            background-color: #E0E0E0;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            padding-top: 70px;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        #sidebar.open {
+            left: 0;
+        }
+
+        #sidebar-toggle {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 1002;
+            font-size: 1.5rem;
+            background-color: #DDD;
+            border: 3px solid #333;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, opacity 0.3s ease;
+        }
+
+        #sidebar-toggle:hover {
+            background-color: #CCC;
+            transform: scale(1.1);
+        }
+
+        body.sidebar-open #mainContent {
+            margin-left: 90px;
+        }
+
+        body.sidebar-open #sidebar-toggle {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .card {
+            background-color: #E0E0E0;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 0 20px #AAA;
+            max-width: 600px;
+            margin: 2rem auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 25px #999;
+        }
+
+        .btn-action {
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background-color: #DDD;
+            color: #333;
+            border: 2px solid #333;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            cursor: pointer;
+            font-size: 0.8rem;
+            width: 100%;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-action:hover {
+            background-color: #CCC;
+            transform: scale(1.05);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #333;
+            border-radius: 0.5rem;
+            background-color: #FFF;
+            color: #333;
+            font-size: 0.9rem;
+            transition: border-color 0.2s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #666;
+        }
+
+        .form-label {
+            margin-bottom: 0.75rem;
+            display: block;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        #sidebar button {
+            font-size: 1.2rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            width: 50px;
+            height: 50px;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #DDD;
+            border: 2px solid #333;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            position: relative;
+        }
+
+        #sidebar button:hover {
+            background-color: #CCC;
+            transform: scale(1.1);
+        }
+
+        #sidebar button .tooltip-text {
+            visibility: hidden;
+            width: max-content;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 1;
+            left: 100%;
+            margin-left: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+
+        #sidebar button:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        #sidebar #btnClearSavedPassword {
+            border-radius: 50%;
+        }
+
+        #sidebar #btnClearSavedPassword i {
+            margin: 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1500;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(128, 128, 128, 0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: #DDD;
+            margin: 5% auto;
+            padding: 2rem;
+            width: 95%;
+            max-width: 600px;
+            border-radius: 1rem;
+            box-shadow: 0 6px 15px rgba(100, 100, 100, 0.7);
+            color: #333;
+            animation: fadeIn 0.5s ease, scaleIn 0.5s ease;
+            transform-origin: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.8);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .close {
+            color: #333;
+            float: right;
+            font-size: 3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #666;
+            transform: scale(1.2);
+        }
+
+        .search-form {
+            max-width: 800px;
+            margin: 2rem auto;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #333;
+            border-radius: 0.5rem;
+            background-color: #FFF;
+            color: #333;
+            font-size: 0.9rem;
+            transition: border-color 0.2s ease;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #666;
+        }
+
+        .btn-search {
+            padding: 0.75rem 1.5rem;
+            background-color: #DDD;
+            color: #333;
+            border: 2px solid #333;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-search:hover {
+            background-color: #CCC;
+            transform: scale(1.05);
+        }
+
+        #linksContainer {
+            max-width: 800px;
+            margin: 2rem auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        #linksContainer.gallery-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 0 1rem;
+        }
+
+        .link-item {
+            background-color: #E0E0E0;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 2px solid #333;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(100, 100, 100, 0.5);
+        }
+
+        .link-item:hover {
+            background-color: #D3D3D3;
+            transform: translateY(-5px);
+        }
+
+        .gallery-view .link-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .gallery-view .link-item .link-details,
+        .gallery-view .link-item .person-name,
+        .gallery-view .link-item .link-title,
+        .gallery-view .link-item .btn-copy,
+        .gallery-view .link-item .btn-decrypt,
+        .gallery-view .link-item .btn-edit,
+        .gallery-view .link-item .btn-delete {
+            display: none;
+        }
+
+        .gallery-view .link-item .decrypted-container {
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: #FFF;
+            border-radius: 0.5rem;
+            border: 1px solid #333;
+        }
+
+        /* Gaya baru untuk gambar dan video yang diperkecil dalam mode galeri */
+        .gallery-view .link-item .decrypted-container img,
+        .gallery-view .link-item .decrypted-container video {
+            max-width: 200px; /* Ukuran maksimum gambar/video dalam mode galeri */
+            max-height: 200px; /* Ukuran maksimum gambar/video dalam mode galeri */
+            width: auto;
+            height: auto;
+            margin-top: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #666;
+            object-fit: contain; /* Memastikan media tidak terdistorsi */
+        }
+
+        .gallery-view .link-item .decrypted-container .btn-download {
+            display: block;
+            margin-top: 0.5rem;
+            width: auto;
+            padding: 0.5rem 1rem;
+            font-size: 0.7rem;
+        }
+
+        .gallery-view .link-item .decrypted-container .btn-hide-content {
+            display: none;
+        }
+
+        .person-name {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #333;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .link-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            background-color: #CCC;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.375rem;
+            display: inline-block;
+            color: #333;
+        }
+
+        .link-details {
+            font-size: 0.9rem;
+            margin: 0.2rem 0;
+            color: #333;
+        }
+
+        .link-url {
+            display: inline-block;
+            max-width: 70%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
+            color: #555;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .link-url:hover {
+            color: #777;
+            text-decoration: underline;
+        }
+
+        a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-copy,
+        .btn-decrypt,
+        .btn-download,
+        .btn-delete,
+        .btn-edit,
+        .btn-hide-content {
+            padding: 0.5rem 1rem;
+            margin: 0.3rem;
+            background-color: #DDD;
+            border: 2px solid #333;
+            border-radius: 0.5rem;
+            color: #333;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-copy:hover,
+        .btn-decrypt:hover,
+        .btn-download:hover,
+        .btn-delete:hover,
+        .btn-edit:hover,
+        .btn-hide-content:hover {
+            background-color: #CCC;
+            transform: scale(1.05);
+        }
+
+        .decrypted-container {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #FFF;
+            border-radius: 0.5rem;
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .decrypted-container img,
+        .decrypted-container video {
+            max-width: 100%;
+            height: auto;
+            margin-top: 1rem;
+            border-radius: 4px;
+            border: 1px solid #666;
+        }
+
+        .remember-me-container {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .remember-me-container input[type="checkbox"] {
+            margin-right: 0.5rem;
+            accent-color: #333;
+        }
+
+        #fullScreenModal {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #fullScreenModal .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        #fullScreenModal .close:hover,
+        #fullScreenModal .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #fullScreenContent {
+            max-width: 90%;
+            max-height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #fullScreenContent img,
+        #fullScreenContent video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border: 3px solid #FFF;
+            border-radius: 0.5rem;
+        }
+
+        @media screen and (max-width: 768px) {
+            #sidebar {
+                width: 70px;
+                left: -70px;
+                padding-top: 60px;
+            }
+
+            body.sidebar-open #mainContent {
+                margin-left: 70px;
+            }
+
+            #sidebar-toggle {
+                font-size: 1.2rem;
+                width: 40px;
+                height: 40px;
+                top: 1rem;
+                left: 1rem;
+            }
+
+            .card,
+            .modal-content,
+            #linksContainer,
+            .search-form {
+                max-width: 95%;
+                margin: 1.5rem auto;
+            }
+
+            .search-form {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn-search {
+                width: 100%;
+            }
+
+            #sidebar button {
+                font-size: 1rem;
+                width: 45px;
+                height: 45px;
+            }
+
+            #sidebar #btnClearSavedPassword {
+                font-size: 1.2rem;
+                width: 45px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="passwordModal">
+        <h1>Upload Key File</h1>
+        <label for="passwordFile" class="custom-file-label">
+            <i class="fas fa-file"></i> Choose File
+        </label>
+        <input type="file" id="passwordFile" accept=".bat">
+        <button id="btnSubmitPassword"><i class="fas fa-upload"></i> Enter</button>
+        <div class="remember-me-container">
+            <input type="checkbox" id="rememberMeCheckbox">
+            <label for="rememberMeCheckbox">Remember Me</label>
+        </div>
+        <p id="passwordError" class="hidden">Incorrect password. Please try again.</p>
+    </div>
+
+    <button id="sidebar-toggle"><i class="fas fa-bars"></i></button>
+
+    <div id="sidebar">
+        <button id="btnShowEncrypt">
+            <i class="fas fa-key"></i>
+            <span class="tooltip-text">Encrypt Image</span>
+        </button>
+        <button id="btnShowForm">
+            <i class="fas fa-plus"></i>
+            <span class="tooltip-text">Add New Link</span>
+        </button>
+        <button id="btnToggleView">
+            <i class="fas fa-th-large"></i>
+            <span class="tooltip-text">Toggle View</span>
+        </button>
+        <!-- Clear Saved Password button moved to the bottom and icon changed -->
+        <button id="btnClearSavedPassword" style="margin-top: auto;">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="tooltip-text">Clear Saved Password</span>
+        </button>
+    </div>
+
+    <div id="mainContent">
+        <form id="searchForm" class="search-form">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search links by person name...">
+            <button type="submit" class="btn-search"><i class="fas fa-search"></i> Search</button>
+        </form>
+
+        <div id="linksContainer"></div>
+
+        <div id="modalForm" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h1 id="modalFormTitle">Add New Link</h1>
+                <form id="linkForm">
+                    <input type="hidden" id="linkId">
+                    <div class="form-group">
+                        <label for="personName" class="form-label">Person Name</label>
+                        <input type="text" id="personName" class="form-input" placeholder="Enter person name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="linkName" class="form-label">Link Name</label>
+                        <input type="text" id="linkName" class="form-input" placeholder="Enter link name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="linkUrl" class="form-label">URL Link</label>
+                        <input type="url" id="linkUrl" class="form-input" placeholder="https://www.example.com"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shiftCode" class="form-label">Shift Code</label>
+                        <input type="text" id="shiftCode" class="form-input" placeholder="Enter shift code">
+                    </div>
+                    <button type="submit" class="btn-action" id="submitLinkButton"><i class="fas fa-save"></i> Save
+                        Link</button>
+                </form>
+                <div id="notification" class="hidden"></div>
+            </div>
+        </div>
+
+        <div id="modalEncrypt" class="modal">
+            <div class="modal-content">
+                <span class="close" id="closeEncryptModal">&times;</span>
+                <h1>Encrypt Image</h1>
+                <form id="encryptForm">
+                    <div class="form-group">
+                        <label for="imageInput" class="form-label">Choose Image</label>
+                        <input type="file" id="imageInput" class="form-input" accept="image/*,video/*" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="encryptShift" class="form-label">Shift Code</label>
+                        <input type="number" id="encryptShift" class="form-input" placeholder="Enter shift code"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="outputFileName" class="form-label">Output File Name (e.g., my_secret.ais)</label>
+                        <input type="text" id="outputFileName" class="form-input" placeholder="encrypted.ais">
+                    </div>
+                    <button type="submit" class="btn-action"><i class="fas fa-lock"></i> Encrypt</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="fullScreenModal" class="modal">
+            <span class="close" id="closeFullScreenModal">&times;</span>
+            <div id="fullScreenContent" class="flex justify-center items-center w-full h-full"></div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script>
+            // Kata sandi yang benar untuk akses
+            const correctPassword = "YQDYIpjYnF7PZtDYs6e8yZJmGqTuB4rgZQSaenc618nmy4x095";
+            // Kunci untuk penyimpanan lokal
+            const LOCAL_STORAGE_KEY = 'savedPassword';
+
+            // Elemen-elemen DOM
+            const passwordModal = document.getElementById('passwordModal');
+            const passwordFile = document.getElementById('passwordFile');
+            const btnSubmitPassword = document.getElementById('btnSubmitPassword');
+            const passwordError = document.getElementById('passwordError');
+            const mainContent = document.getElementById('mainContent');
+            const rememberMeCheckbox = document.getElementById('rememberMeCheckbox');
+
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const btnShowEncrypt = document.getElementById('btnShowEncrypt');
+            const btnShowForm = document.getElementById('btnShowForm');
+            const btnClearSavedPassword = document.getElementById('btnClearSavedPassword');
+            const btnToggleView = document.getElementById('btnToggleView');
+
+            const modalForm = document.getElementById('modalForm');
+            const closeModal = document.querySelector('#modalForm .close');
+            const modalFormTitle = document.getElementById('modalFormTitle');
+            const linkForm = document.getElementById('linkForm');
+            const linkIdInput = document.getElementById('linkId');
+            const personNameInput = document.getElementById('personName');
+            const linkNameInput = document.getElementById('linkName');
+            const linkUrlInput = document.getElementById('linkUrl');
+            const shiftCodeInput = document.getElementById('shiftCode');
+            const submitLinkButton = document.getElementById('submitLinkButton');
+
+            const notification = document.getElementById('notification');
+            const linksContainer = document.getElementById('linksContainer');
+            const searchForm = document.getElementById('searchForm');
+            const searchInput = document.getElementById('searchInput');
+
+            const modalEncrypt = document.getElementById('modalEncrypt');
+            const closeEncryptModal = document.getElementById('closeEncryptModal');
+            const encryptForm = document.getElementById('encryptForm');
+            const outputFileNameInput = document.getElementById('outputFileName');
+
+            const fullScreenModal = document.getElementById('fullScreenModal');
+            const fullScreenContent = document.getElementById('fullScreenContent');
+            const closeFullScreenModal = document.getElementById('closeFullScreenModal');
+
+            // Variabel untuk melacak mode tampilan (daftar atau galeri)
+            let isGalleryView = false;
+
+            // Fungsi untuk menampilkan konten utama setelah otentikasi
+            function showMainContent() {
+                passwordModal.style.display = 'none';
+                mainContent.style.display = 'block';
+                loadLinks();
+            }
+
+            // Fungsi untuk memeriksa kata sandi
+            async function checkPassword(password) {
+                if (password === correctPassword) {
+                    showMainContent();
+                    return true;
+                } else {
+                    passwordError.textContent = "Kata sandi salah. Silakan coba lagi.";
+                    passwordError.classList.remove('hidden');
+                    return false;
+                }
+            }
+
+            // Memeriksa kata sandi yang tersimpan saat DOM dimuat
+            window.addEventListener('DOMContentLoaded', () => {
+                const savedPassword = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (savedPassword) {
+                    checkPassword(savedPassword);
+                }
+            });
+
+            // Event listener untuk perubahan file kata sandi
+            passwordFile.addEventListener('change', () => {
+                if (passwordFile.files.length === 0) {
+                    passwordError.textContent = "Mohon pilih file.";
+                    passwordError.classList.remove('hidden');
+                    return;
+                }
+
+                const file = passwordFile.files[0];
+                if (!file.name.endsWith('.bat')) {
+                    passwordError.textContent = "File harus dalam format .bat.";
+                    passwordError.classList.remove('hidden');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = async function (event) {
+                    const fileContent = event.target.result.trim();
+                    const passwordCorrect = await checkPassword(fileContent);
+                    if (passwordCorrect && rememberMeCheckbox.checked) {
+                        localStorage.setItem(LOCAL_STORAGE_KEY, fileContent);
+                    } else if (!passwordCorrect) {
+                        localStorage.removeItem(LOCAL_STORAGE_KEY);
+                    }
+                };
+                reader.onerror = function () {
+                    passwordError.textContent = "Error membaca file.";
+                    passwordError.classList.remove('hidden');
+                };
+                reader.readAsText(file);
+            });
+
+            // Event listener untuk tombol submit kata sandi
+            btnSubmitPassword.addEventListener('click', async () => {
+                if (passwordFile.files.length === 0) {
+                    passwordError.textContent = "Mohon pilih file.";
+                    passwordError.classList.remove('hidden');
+                    return;
+                }
+
+                const file = passwordFile.files[0];
+                if (!file.name.endsWith('.bat')) {
+                    passwordError.textContent = "File harus dalam format .bat.";
+                    passwordError.classList.remove('hidden');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = async function (event) {
+                    const fileContent = event.target.result.trim();
+                    const passwordCorrect = await checkPassword(fileContent);
+                    if (passwordCorrect && rememberMeCheckbox.checked) {
+                        localStorage.setItem(LOCAL_STORAGE_KEY, fileContent);
+                    } else if (!passwordCorrect) {
+                        localStorage.removeItem(LOCAL_STORAGE_KEY);
+                    }
+                };
+                reader.onerror = function () {
+                    passwordError.textContent = "Error membaca file.";
+                    passwordError.classList.remove('hidden');
+                };
+                reader.readAsText(file);
+            });
+
+            // Event listener untuk tombol hapus kata sandi yang tersimpan
+            btnClearSavedPassword.addEventListener('click', () => {
+                const confirmationModal = document.createElement('div');
+                confirmationModal.className = 'modal';
+                confirmationModal.innerHTML = `
+                    <div class="modal-content">
+                        <h2>Konfirmasi Hapus Kata Sandi</h2>
+                        <p>Apakah Anda yakin ingin menghapus kata sandi yang tersimpan dari perangkat ini?</p>
+                        <button id="confirmClear" class="btn-action" style="width:auto; margin-right:10px;"><i class="fas fa-check"></i> Ya</button>
+                        <button id="cancelClear" class="btn-action" style="width:auto;"><i class="fas fa-times"></i> Tidak</button>
+                    </div>
+                `;
+                document.body.appendChild(confirmationModal);
+                confirmationModal.style.display = 'block';
+
+                document.getElementById('confirmClear').addEventListener('click', () => {
+                    localStorage.removeItem(LOCAL_STORAGE_KEY);
+                    showNotification('Kata sandi tersimpan telah dihapus.', false);
+                    confirmationModal.remove();
+                    passwordModal.style.display = 'flex';
+                    mainContent.style.display = 'none';
+                    passwordError.classList.add('hidden');
+                    sidebar.classList.remove('open');
+                    document.body.classList.remove('sidebar-open');
+                });
+
+                document.getElementById('cancelClear').addEventListener('click', () => {
+                    confirmationModal.remove();
+                });
+
+                confirmationModal.addEventListener('click', (event) => {
+                    if (event.target === confirmationModal) {
+                        confirmationModal.remove();
+                    }
+                });
+            });
+
+            // Inisialisasi Supabase Client
+            const SUPABASE_URL = 'https://qzdvdfebkzlwkhvxwsju.supabase.co';
+            const SUPABASE_ANON_KEY =
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6ZHZkZmVia3psd2todnh3c2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcyMTA4OTksImV4cCI6MjA1Mjc4Njg5OX0.Z9XKmX49vu0kZwn6YMom8QeLNNdKQMXCIkxcIoHKQFs';
+            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            // Fungsi untuk menampilkan notifikasi
+            function showNotification(message, isError = false) {
+                notification.textContent = message;
+                notification.style.borderColor = isError ? '#800000' : '#333';
+                notification.classList.remove('hidden');
+                setTimeout(() => {
+                    notification.classList.add('hidden');
+                }, 4000);
+            }
+
+            // Fungsi untuk menyalin teks ke clipboard
+            async function copyToClipboard(text) {
+                try {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    showNotification('URL berhasil disalin.');
+                } catch (err) {
+                    console.error('Gagal menyalin: ', err);
+                    showNotification('Gagal menyalin URL.', true);
+                }
+            }
+
+            // Fungsi untuk mendekripsi dan menampilkan konten
+            async function decryptAndDisplay(linkItem, url, shift) {
+                const decryptedContainer = linkItem.querySelector('.decrypted-container');
+
+                if (!decryptedContainer) return;
+
+                // Sembunyikan konten jika sudah ditampilkan dan bukan dalam mode galeri
+                if (!decryptedContainer.classList.contains('hidden') && !isGalleryView) {
+                    decryptedContainer.classList.add('hidden');
+                    decryptedContainer.innerHTML = '';
+                    return;
+                }
+
+                decryptedContainer.classList.remove('hidden');
+                decryptedContainer.innerHTML = '<p style="margin: 0; font-size: 0.8rem; color:#666;">Mendekripsi...</p>';
+
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error('Gagal mengambil file untuk dekripsi.');
+                    }
+                    const contentLength = response.headers.get('Content-Length');
+                    let textContent = await response.text();
+                    if (shift !== 0) {
+                        textContent = caesarDecipher(textContent, shift);
+                    }
+
+                    decryptedContainer.innerHTML = '';
+                    let mediaElement;
+                    let fileExtension = '';
+                    let dimensionsInfo = '';
+
+                    // Menentukan jenis media dan membuat elemen yang sesuai
+                    if (textContent.startsWith('data:image/')) {
+                        mediaElement = document.createElement('img');
+                        mediaElement.src = textContent;
+                        mediaElement.alt = 'Gambar Terdekripsi';
+                        fileExtension = 'png';
+                        mediaElement.addEventListener('load', () => {
+                            const width = mediaElement.naturalWidth;
+                            const height = mediaElement.naturalHeight;
+                            dimensionsInfo = `Dimensi: ${width} x ${height}`;
+                        });
+                    } else if (textContent.startsWith('data:video/')) {
+                        mediaElement = document.createElement('video');
+                        mediaElement.src = textContent;
+                        mediaElement.controls = true;
+                        mediaElement.autoplay = false;
+                        mediaElement.loop = true;
+                        fileExtension = 'mp4';
+                        mediaElement.addEventListener('loadedmetadata', () => {
+                            const width = mediaElement.videoWidth;
+                            const height = mediaElement.videoHeight;
+                            const duration = mediaElement.duration;
+                            dimensionsInfo = `Durasi: ${duration.toFixed(2)}s`; // Menghapus lebar x tinggi untuk video
+                        });
+                    } else {
+                        const pre = document.createElement('pre');
+                        pre.textContent = textContent;
+                        pre.style.whiteSpace = 'pre-wrap';
+                        pre.style.wordBreak = 'break-all';
+                        mediaElement = pre;
+                        fileExtension = 'txt';
+                    }
+
+                    // Gaya dasar untuk elemen media
+                    mediaElement.style.maxWidth = '100%';
+                    mediaElement.style.marginTop = '1rem';
+                    mediaElement.style.borderRadius = '4px';
+                    mediaElement.style.border = '1px solid #666';
+
+                    // Event listener untuk mode layar penuh
+                    mediaElement.addEventListener('click', () => {
+                        fullScreenContent.innerHTML = '';
+                        const fullScreenMedia = mediaElement.cloneNode(true);
+                        fullScreenMedia.controls = true;
+                        fullScreenMedia.autoplay = true;
+                        fullScreenMedia.loop = true;
+                        fullScreenContent.appendChild(fullScreenMedia);
+                        fullScreenModal.style.display = 'flex';
+                    });
+
+                    // Tombol unduh
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.className = 'btn-download';
+                    downloadBtn.innerHTML = `<i class="fas fa-download"></i> Unduh ${fileExtension.toUpperCase()}`;
+                    downloadBtn.addEventListener('click', () => {
+                        const a = document.createElement('a');
+                        a.href = textContent;
+                        a.download = `decrypted_file.${fileExtension}`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    });
+
+                    // Tombol sembunyikan konten (tidak ditampilkan dalam mode galeri)
+                    const hideBtn = document.createElement('button');
+                    hideBtn.className = 'btn-hide-content';
+                    hideBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Sembunyikan Konten';
+                    hideBtn.addEventListener('click', () => {
+                        decryptedContainer.classList.add('hidden');
+                        decryptedContainer.innerHTML = '';
+                    });
+
+                    decryptedContainer.appendChild(mediaElement);
+                    decryptedContainer.appendChild(downloadBtn);
+                    if (!isGalleryView) { // Hanya tampilkan tombol sembunyikan jika bukan mode galeri
+                        decryptedContainer.appendChild(hideBtn);
+                    }
+
+                    // Tampilkan informasi ukuran file atau dimensi
+                    if (contentLength || dimensionsInfo) {
+                        const infoDiv = document.createElement('div');
+                        infoDiv.style.marginTop = '0.5rem';
+                        let sizeText = '-';
+                        if (contentLength) {
+                            sizeText = `${(parseInt(contentLength) / 1024).toFixed(2)} KB`;
+                        }
+                        infoDiv.innerHTML =
+                            `<p style="font-size: 0.7rem; color: #333;">Ukuran File: ${sizeText} | ${dimensionsInfo}</p>`;
+                        decryptedContainer.appendChild(infoDiv);
+                    }
+
+                } catch (error) {
+                    decryptedContainer.innerHTML = '';
+                    showNotification(error.message, true);
+                }
+            }
+
+            // Fungsi untuk memuat dan menampilkan tautan
+            async function loadLinks(searchQuery = '') {
+                linksContainer.innerHTML = ''; // Pastikan ini selalu ada di awal
+                linksContainer.innerHTML = '<p class="text-center" style="color:#666;">Memuat tautan...</p>'; // Indikator pemuatan
+
+                let query = supabaseClient.from('links').select('*').order('created_at', {
+                    ascending: false
+                });
+                if (searchQuery.trim() !== '') {
+                    query = query.ilike('person_name', `%${searchQuery}%`);
+                }
+                const { data, error } = await query;
+                if (error) {
+                    console.error(error);
+                    showNotification('Error memuat tautan.', true);
+                    linksContainer.innerHTML = '<p class="text-center" style="color:#800000;">Error memuat tautan.</p>';
+                    return;
+                }
+                if (!data || data.length === 0) {
+                    linksContainer.innerHTML = '<p class="text-center" style="color:#666;">Tidak ada tautan ditemukan.</p>';
+                    return;
+                }
+
+                linksContainer.innerHTML = ''; // Hapus indikator pemuatan dan siapkan untuk konten sebenarnya
+
+                // Terapkan atau hapus kelas gallery-view
+                if (isGalleryView) {
+                    linksContainer.classList.add('gallery-view');
+                } else {
+                    linksContainer.classList.remove('gallery-view');
+                }
+
+                data.forEach(link => {
+                    const linkItem = document.createElement('div');
+                    linkItem.className = 'link-item';
+                    linkItem.innerHTML = `
+                        <p class="person-name">${link.person_name || 'UNKNOWN'}</p>
+                        <p class="link-title">${link.name}</p>
+                        <p class="link-details">
+                            <strong>URL:</strong>
+                            <a href="${link.url}" target="_blank" class="link-url">${link.url}</a>
+                            <button class="btn-copy" data-url="${link.url}"><i class="fas fa-copy"></i> Salin</button>
+                        </p>
+                        <p class="link-details">
+                            <strong>Kode Shift:</strong> ${link.shift_code || '-'}
+                        </p>
+                        <div>
+                            <button class="btn-decrypt" data-url="${link.url}" data-shift="${link.shift_code || 0}">
+                                <i class="fas fa-lock-open"></i> Dekripsi
+                            </button>
+                            <button class="btn-edit" data-id="${link.id}" data-person="${link.person_name || ''}" data-name="${link.name}" data-url="${link.url}" data-shift="${link.shift_code || ''}">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn-delete" data-id="${link.id}">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </div>
+                        <div class="decrypted-container hidden"></div>
+                    `;
+                    linksContainer.appendChild(linkItem);
+
+                    // Secara otomatis dekripsi dan tampilkan dalam mode galeri
+                    if (isGalleryView) {
+                        decryptAndDisplay(linkItem, link.url, parseInt(link.shift_code) || 0);
+                    }
+                });
+
+                // Event listener untuk tombol salin
+                document.querySelectorAll('.btn-copy').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const url = button.getAttribute('data-url');
+                        copyToClipboard(url);
+                    });
+                });
+
+                // Event listener untuk tombol dekripsi
+                document.querySelectorAll('.btn-decrypt').forEach(button => {
+                    button.addEventListener('click', async () => {
+                        const url = button.getAttribute('data-url');
+                        const shift = parseInt(button.getAttribute('data-shift')) || 0;
+                        const linkItem = button.closest('.link-item');
+                        decryptAndDisplay(linkItem, url, shift);
+                    });
+                });
+
+                // Event listener untuk tombol edit
+                document.querySelectorAll('.btn-edit').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const id = button.getAttribute('data-id');
+                        const personName = button.getAttribute('data-person');
+                        const linkName = button.getAttribute('data-name');
+                        const linkUrl = button.getAttribute('data-url');
+                        const shiftCode = button.getAttribute('data-shift');
+
+                        linkIdInput.value = id;
+                        personNameInput.value = personName;
+                        linkNameInput.value = linkName;
+                        linkUrlInput.value = linkUrl;
+                        shiftCodeInput.value = shiftCode;
+
+                        modalFormTitle.textContent = 'Edit Tautan';
+                        submitLinkButton.innerHTML = '<i class="fas fa-save"></i> Perbarui Tautan';
+
+                        modalForm.style.display = 'block';
+                    });
+                });
+
+                // Event listener untuk tombol hapus
+                document.querySelectorAll('.btn-delete').forEach(button => {
+                    button.addEventListener('click', async () => {
+                        const deleteConfirmationModal = document.createElement('div');
+                        deleteConfirmationModal.className = 'modal';
+                        deleteConfirmationModal.innerHTML = `
+                            <div class="modal-content">
+                                <h2>Konfirmasi Hapus Tautan</h2>
+                                <p>Apakah Anda yakin ingin menghapus tautan ini?</p>
+                                <button id="confirmDelete" class="btn-action" style="width:auto; margin-right:10px;"><i class="fas fa-check"></i> Ya</button>
+                                <button id="cancelDelete" class="btn-action" style="width:auto;"><i class="fas fa-times"></i> Tidak</button>
+                            </div>
+                        `;
+                        document.body.appendChild(deleteConfirmationModal);
+                        deleteConfirmationModal.style.display = 'block';
+
+                        document.getElementById('confirmDelete').addEventListener('click', async () => {
+                            const id = button.getAttribute('data-id');
+                            const { error } = await supabaseClient
+                                .from('links')
+                                .delete()
+                                .eq('id', id);
+                            if (error) {
+                                console.error(error);
+                                showNotification('Gagal menghapus tautan.', true);
+                            } else {
+                                showNotification('Tautan berhasil dihapus.');
+                                loadLinks(searchInput.value);
+                            }
+                            deleteConfirmationModal.remove();
+                        });
+
+                        document.getElementById('cancelDelete').addEventListener('click', () => {
+                            deleteConfirmationModal.remove();
+                        });
+
+                        deleteConfirmationModal.addEventListener('click', (event) => {
+                            if (event.target === deleteConfirmationModal) {
+                                deleteConfirmationModal.remove();
+                            }
+                        });
+                    });
+                });
+            }
+
+            // Event listener untuk menampilkan formulir tambah/edit
+            btnShowForm.addEventListener('click', () => {
+                linkForm.reset();
+                linkIdInput.value = '';
+                modalFormTitle.textContent = 'Tambah Tautan Baru';
+                submitLinkButton.innerHTML = '<i class="fas fa-save"></i> Simpan Tautan';
+                modalForm.style.display = 'block';
+                sidebar.classList.remove('open');
+                document.body.classList.remove('sidebar-open');
+            });
+
+            // Event listener untuk menutup modal formulir
+            closeModal.addEventListener('click', () => {
+                modalForm.style.display = 'none';
+            });
+
+            // Event listener untuk menutup modal formulir saat mengklik di luar konten
+            window.addEventListener('click', (event) => {
+                if (event.target == modalForm) {
+                    modalForm.style.display = 'none';
+                }
+            });
+
+            // Event listener untuk submit formulir tautan
+            linkForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = linkIdInput.value;
+                const personName = personNameInput.value.trim();
+                const linkName = linkNameInput.value.trim();
+                const linkUrl = linkUrlInput.value.trim();
+                const shiftCode = shiftCodeInput.value.trim();
+
+                if (!personName || !linkName || !linkUrl) {
+                    showNotification('Nama Orang, Nama Tautan, dan URL wajib diisi.', true);
+                    return;
+                }
+
+                let error;
+                if (id) {
+                    ({ error } = await supabaseClient
+                        .from('links')
+                        .update({ person_name: personName, name: linkName, url: linkUrl, shift_code: shiftCode })
+                        .eq('id', id));
+                } else {
+                    ({ error } = await supabaseClient
+                        .from('links')
+                        .insert([{ person_name: personName, name: linkName, url: linkUrl, shift_code: shiftCode }]));
+                }
+
+                if (error) {
+                    console.error(error);
+                    showNotification(`Error ${id ? 'memperbarui' : 'menyimpan'} tautan.`, true);
+                } else {
+                    showNotification(`Tautan ${id ? 'diperbarui' : 'disimpan'} berhasil.`, false);
+                    linkForm.reset();
+                    linkIdInput.value = '';
+                    modalForm.style.display = 'none';
+                    loadLinks(searchInput.value);
+                }
+            });
+
+            // Fungsi debounce untuk pencarian
+            function debounce(func, delay) {
+                let timeout;
+                return function (...args) {
+                    const context = this;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+
+            // Terapkan debounce ke input pencarian
+            const debouncedLoadLinks = debounce((query) => {
+                loadLinks(query);
+            }, 300); // Penundaan 300ms
+
+            // Event listener untuk input pencarian
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value;
+                debouncedLoadLinks(query);
+            });
+
+            // Event listener untuk submit formulir pencarian
+            searchForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const query = searchInput.value;
+                loadLinks(query); // Tidak ada debounce pada submit eksplisit
+            });
+
+            // Event listener untuk menampilkan modal enkripsi
+            btnShowEncrypt.addEventListener('click', () => {
+                modalEncrypt.style.display = 'block';
+                sidebar.classList.remove('open');
+                document.body.classList.remove('sidebar-open');
+            });
+
+            // Event listener untuk menutup modal enkripsi
+            closeEncryptModal.addEventListener('click', () => {
+                modalEncrypt.style.display = 'none';
+            });
+
+            // Event listener untuk menutup modal enkripsi saat mengklik di luar konten
+            window.addEventListener('click', (event) => {
+                if (event.target == modalEncrypt) {
+                    modalEncrypt.style.display = 'none';
+                }
+            });
+
+            // Event listener untuk submit formulir enkripsi
+            encryptForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const fileInput = document.getElementById('imageInput');
+                const shiftValue = parseInt(document.getElementById('encryptShift').value) || 0;
+                const outputFileName = outputFileNameInput.value.trim();
+
+                if (fileInput.files.length === 0) {
+                    showNotification('Silakan pilih gambar atau video untuk dienkripsi.', true);
+                    return;
+                }
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const dataUrl = event.target.result;
+                    const encryptedData = caesarCipher(dataUrl, shiftValue);
+
+                    const blob = new Blob([encryptedData], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = outputFileName || 'encrypted.ais';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    showNotification('Konten berhasil dienkripsi dan diunduh.');
+                    encryptForm.reset();
+                    modalEncrypt.style.display = 'none';
+                };
+                reader.onerror = function (err) {
+                    console.error(err);
+                    showNotification('Error membaca file.', true);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Fungsi Caesar Cipher (enkripsi)
+            function caesarCipher(str, shift) {
+                return str.replace(/[a-zA-Z]/g, function (c) {
+                    const base = c <= 'Z' ? 65 : 97;
+                    return String.fromCharCode((c.charCodeAt(0) - base + shift) % 26 + base);
+                });
+            }
+
+            // Fungsi Caesar Decipher (dekripsi)
+            function caesarDecipher(str, shift) {
+                return str.replace(/[a-zA-Z]/g, function (c) {
+                    const base = c <= 'Z' ? 65 : 97;
+                    return String.fromCharCode((c.charCodeAt(0) - base - shift + 26) % 26 + base);
+                });
+            }
+
+            // Event listener untuk tombol toggle sidebar
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                document.body.classList.toggle('sidebar-open');
+                if (sidebar.classList.contains('open')) {
+                    sidebarToggle.style.opacity = '0';
+                    sidebarToggle.style.pointerEvents = 'none';
+                } else {
+                    sidebarToggle.style.opacity = '1';
+                    sidebarToggle.style.pointerEvents = 'auto';
+                }
+            });
+
+            // Event listener untuk menutup sidebar saat mengklik di luar sidebar
+            mainContent.addEventListener('click', (event) => {
+                if (sidebar.classList.contains('open')) {
+                    if (!sidebar.contains(event.target) && event.target !== sidebarToggle) {
+                        sidebar.classList.remove('open');
+                        document.body.classList.remove('sidebar-open');
+                        sidebarToggle.style.opacity = '1';
+                        sidebarToggle.style.pointerEvents = 'auto';
+                    }
+                }
+            });
+
+            // Event listener untuk tombol-tombol di sidebar (menutup sidebar saat diklik)
+            sidebar.querySelectorAll('button').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (!button.closest('.modal')) {
+                        sidebar.classList.remove('open');
+                        document.body.classList.remove('sidebar-open');
+                        sidebarToggle.style.opacity = '1';
+                        sidebarToggle.style.pointerEvents = 'auto';
+                    }
+                });
+            });
+
+            // Event listener untuk menutup modal layar penuh
+            closeFullScreenModal.addEventListener('click', () => {
+                fullScreenModal.style.display = 'none';
+                fullScreenContent.innerHTML = '';
+            });
+
+            // Event listener untuk menutup modal layar penuh saat mengklik di luar konten
+            fullScreenModal.addEventListener('click', (event) => {
+                if (event.target === fullScreenModal) {
+                    fullScreenModal.style.display = 'none';
+                    fullScreenContent.innerHTML = '';
+                }
+            });
+
+            // Event listener untuk tombol toggle tampilan (galeri/daftar)
+            btnToggleView.addEventListener('click', () => {
+                isGalleryView = !isGalleryView;
+                loadLinks(searchInput.value);
+                sidebar.classList.remove('open');
+                document.body.classList.remove('sidebar-open');
+            });
+        </script>
+    </div>
+</body>
+
+</html>
